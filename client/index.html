@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Państwa miasta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="info"></div>
+
+    <div class="container">
+      <p class="categories">Categories</p>
+      <label for="players-number">Number of players:</label>
+      <select id="players-number" class="players-number">
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+      <label for="round-time">Round time:</label>
+      <select id="round-time" class="round-time">
+        <option value="30">30 seconds</option>
+        <option value="60" selected>1 minute</option>
+        <option value="120">2 minute</option>
+        <option value="180">3 minute</option>
+      </select>
+      <label for="round-input">Number of rounds:</label>
+      <input type="number" id="round-input" class="round-input" value="2" min="1" />
+      <label for="town">
+        Town
+        <input type="checkbox" id="town" class="checkbox" checked />
+      </label>
+      <label for="country">
+        Country
+        <input type="checkbox" id="country" class="checkbox" />
+      </label>
+      <label for="plant">
+        Plant
+        <input type="checkbox" id="plant" class="checkbox" checked />
+      </label>
+      <label for="river">
+        River
+        <input type="checkbox" id="river" class="checkbox" />
+      </label>
+      <button type="submit" class="host">Host</button>
+      <!-- <label for="code">Code:</label>
+      <input type="number" class="code-input" />
+      <button type="button" class="join">Join with code</button> -->
+    </div>
+
+    <table class="table inactive"></table>
+
+    <div class="timer-container inactive">
+      <p class="letter-container">Letter: <span class="letter">-</span></p>
+      <p class="timer">00:00</p>
+      <button class="start-btn">Press if ready</button>
+    </div>
+
+    <div class="players inactive">
+      <h3 class="players-header">Players:</h3>
+      <ul class="players-list"></ul>
+    </div>
+
+    <button class="done-btn inactive">I'M DONE</button>
+
+    <p class="join-code"></p>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script src="/host.js"></script>
+    <script src="/game.js"></script>
+  </body>
+</html>

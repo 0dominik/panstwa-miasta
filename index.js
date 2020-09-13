@@ -153,7 +153,6 @@ io.on('connect', (socket) => {
       if (games[password]['roundsCounter'] == games[password]['rounds']) {
         console.log('KONIEC GRY');
         io.to(password).emit('endgame', games[password]['players']);
-        io.to(password).emit('deleteGame', password);
       }
 
       socket.on('deleteGame', () => {

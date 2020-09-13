@@ -8,42 +8,39 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <h1 class="logo">Scattergories game</h1>
     <div class="info"></div>
-
     <div class="container">
-      <p class="categories">Categories</p>
       <label for="players-number">Number of players:</label>
-      <select id="players-number" class="players-number">
+      <select id="players-number" class="input number-input players-number">
         <option value="2">2</option>
         <option value="3">3</option>
         <option value="4">4</option>
         <option value="5">5</option>
       </select>
       <label for="round-time">Round time:</label>
-      <select id="round-time" class="round-time">
+      <select id="round-time" class="input select-input round-time">
         <option value="30">30 seconds</option>
         <option value="60" selected>1 minute</option>
         <option value="120">2 minute</option>
         <option value="180">3 minute</option>
       </select>
       <label for="round-input">Number of rounds:</label>
-      <input type="number" id="round-input" class="round-input" value="2" min="1" />
-      <label for="town">
-        Town
+      <input type="number" id="round-input" class="number-input input round-input" value="2" min="1" />
+      <div class="categories">
+        <input type="checkbox" id="country" class="checkbox" checked />
+        <label for="country"> Country </label>
         <input type="checkbox" id="town" class="checkbox" checked />
-      </label>
-      <label for="country">
-        Country
-        <input type="checkbox" id="country" class="checkbox" />
-      </label>
-      <label for="plant">
-        Plant
-        <input type="checkbox" id="plant" class="checkbox" checked />
-      </label>
-      <label for="river">
-        River
-        <input type="checkbox" id="river" class="checkbox" />
-      </label>
+        <label for="town"> Town </label>
+        <input type="checkbox" id="river" class="checkbox" checked />
+        <label for="river"> River </label>
+        <input type="checkbox" id="name" class="checkbox" checked />
+        <label for="name"> Name </label>
+        <input type="checkbox" id="plant" class="checkbox" />
+        <label for="plant"> Plant </label>
+        <input type="checkbox" id="animal" class="checkbox" />
+        <label for="animal"> Animal </label>
+      </div>
       <button type="submit" class="host">Host</button>
       <!-- <label for="code">Code:</label>
       <input type="number" class="code-input" />

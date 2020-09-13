@@ -148,13 +148,9 @@ socket.on('endgame', (data) => {
 
   const points = [];
 
-  playersList.innerHTML = `
-  ${Object.keys(data)
-    .map((el) => {
-      points.push(data[el]['points']);
-      return `<li class="points">${data[el]['name']}: ${data[el]['points']} points</li>`;
-    })
-    .join('')}`;
+  Object.keys(data).forEach((el) => {
+    points.push(data[el]['points']);
+  });
 
   const winner = [];
 
@@ -167,6 +163,8 @@ socket.on('endgame', (data) => {
   const form = winner.length > 1 ? 'winners are' : 'winner is';
 
   info.textContent = `GAME ENDED! The ${form} ${winner}`;
+
+  socket.emit('deleteGame', password);
 });
 
 const createTable = (cat) => {

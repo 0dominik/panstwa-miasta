@@ -1,5 +1,4 @@
 const socket = io();
-console.log('hi from host.js');
 
 const container = document.querySelector('.container');
 const host = document.querySelector('.host');
@@ -15,12 +14,12 @@ host.addEventListener('click', (e) => {
     return el.checked ? categories.push(el.id) : null;
   });
 
-  if (categories.length < 2 || rounds.value < 1) {
-    info.textContent = 'Select at least 2 categories and enter number of rounds!';
+  if (categories.length < 2 || rounds.value < 1 || rounds.value > 10) {
+    info.textContent = 'Select at least 2 categories and enter number of rounds between 1 and 10!';
     info.classList.remove('inactive');
     categories = [];
   } else {
-    info.classList.add('inactive');
+    info.textContent = 'Wait for other players...';
     container.classList.add('inactive');
     timerContainer.classList.remove('inactive');
     timerContainer.classList.remove('inactive');
@@ -34,7 +33,7 @@ socket.on('setcode', (data) => {
     window.history.pushState('', '', `/${data.password}`);
     const players = document.querySelector('.players');
     players.classList.remove('inactive');
-    joinCodeEl.innerText = `Join code: ${data.password}`;
+    joinCodeEl.innerText = `Join address: ${window.location.href}`;
     password = data.password;
     timer.textContent = `0${data.roundTime / 60}:00`;
   }

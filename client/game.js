@@ -1,5 +1,4 @@
 socket.emit('joinroom', location.pathname.substring(1));
-console.log('hi from game.js');
 
 const table = document.querySelector('.table');
 const timerContainer = document.querySelector('.timer-container');
@@ -8,24 +7,40 @@ let password = '';
 
 const playersList = document.querySelector('.players-list');
 const players = document.querySelector('.players');
-const joinCodeEl = document.querySelector('.join-code');
+const joinCodeEl = document.querySelector('.join-address');
 
 socket.on('playerchange', (game) => {
   playersList.innerHTML = `
-      ${Object.keys(game.words)
-        .map((el) => {
-          if (game.words[el].length != 0) {
-            if (el == socket.id) {
-              return `<li class="points hl">[YOU]${game['players'][el]['name']}: ${game['players'][el]['points']} points, last words: ${game.words[el]}</li>`;
-            } else {
-              return `<li class="points">${game['players'][el]['name']}: ${game['players'][el]['points']} points, last words: ${game.words[el]}</li>`;
-            }
+    ${Object.keys(game.words)
+      .map((el) => {
+        if (game.words[el].length != 0) {
+          if (el == socket.id) {
+            return `<li class="points hl">[YOU]${game['players'][el]['name']}: ${game['players'][el]['points']} points, last words: ${game.words[el]}</li>`;
           } else {
-            if (el == socket.id) {
-              return `<li class="points hl">[YOU]${game['players'][el]['name']}: ${game['players'][el]['points']} points</li>`;
-            } else {
-              return `<li class="points">${game['players'][el]['name']}: ${game['players'][el]['points']} points</li>`;
-            }
+            return `<li class="points">${game['players'][el]['name']}: ${game['players'][el]['points']} points, last words: ${game.words[el]}</li>`;
+          }
+        } else {
+          if (el == socket.id) {
+            return `<li class="points hl">[YOU]${game['players'][el]['name']}: ${game['players'][el]['points']} points</li>`;
+          } else {
+            return `<li class="points">${game['players'][el]['name']}: ${game['players'][el]['points']} points</li>`;
+          }
+        }
+      })
+      .join('')}`;
+
+  const players = game.players;
+
+  playersList.innerHTML = `
+      ${Object.keys(game.players)
+        .map((el) => {
+          const isReady = players[el].isReady ? 'READY' : '';
+          const words = players[el].words ? `, last words: ${players[el].words}` : '';
+
+          if (el == socket.id) {
+            return `<li class="points hl">[YOU]${players[el].name}: ${players[el].points} points${words} ${isReady}</li>`;
+          } else {
+            return `<li class="points">${players[el].name}: ${players[el].points} points${words} ${isReady}</li>`;
           }
         })
         .join('')}`;
@@ -36,9 +51,8 @@ const incorrectCode = document.querySelector('.incorrect');
 const readyBtn = document.querySelector('.start-btn');
 
 readyBtn.addEventListener('click', () => {
-  console.log('kliknieto');
   readyBtn.textContent = 'Waiting for other players...';
-  socket.emit('ready', { password: password, id: socket.id });
+  socket.emit('ready', { id: socket.id, password: location.pathname.substring(1) });
 });
 
 const letter = document.querySelector('.letter');
@@ -60,13 +74,12 @@ socket.on('start', ({ game, password }) => {
         <li>round time: ${game['roundTime']} seconds</li>  
         <li>password: ${game['id']}</li>  
         <li>max players: ${game['maxPlayers']}</li>
-        <li>After every round you can mark other player's word as a wrong</li>  
       </ul>`;
 
   const tbody = document.querySelector('.tbody');
   tbody.innerHTML += `<tr class="tr">
-      <td>${game.letter}</td>
-      ${'<td class="word" contenteditable></td>'.repeat(game['categories'].length)}
+      <td class="td">${game.letter}</td>
+      ${'<td class="td word" contenteditable></td>'.repeat(game['categories'].length)}
     </tr>`;
 
   startTimer(game['roundTime'], timer, password);
@@ -105,6 +118,7 @@ doneBtn.addEventListener('click', () => {
 
 socket.on('endround', (data) => {
   const words = document.querySelectorAll('.word');
+  doneBtn.classList.add('inactive');
   let wordList = [];
 
   const x = [...words].forEach((el) => {
@@ -171,8 +185,8 @@ const createTable = (cat) => {
   return `
   <thead>
   <tr>
-    <th>letter</th>
-    ${cat.map((el) => `<th>${el}</th>`).join('')}
+    <th class="th">letter</th>
+    ${cat.map((el) => `<th class="th">${el}</th>`).join('')}
   </tr>
   </thead>
   <tbody class="tbody">

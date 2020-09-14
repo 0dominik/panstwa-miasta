@@ -5,22 +5,30 @@ html {
 body {
   background-color: #9dd9d2;
   font-size: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 * {
   font-family: 'Space Mono', monospace;
+  margin: 0;
+  padding: 0;
 }
 
 .logo {
   text-align: center;
   color: #392f5a;
+  background-color: #f3c545;
+  margin-bottom: 25px;
+  padding: 10px;
+  width: 100vw;
 }
 
 .input-container {
   display: flex;
   flex-direction: row;
-  justify-content: center;
-  align-items: center;
 }
 
 li {
@@ -30,7 +38,6 @@ li {
 .input {
   width: 110px;
   height: 30px;
-  background-color: #fff8f0;
   border: 1px solid #392f5a;
   box-sizing: border-box;
   transition: 0.1s;
@@ -39,7 +46,6 @@ li {
 
 .input:hover, .input:focus {
   border: 2px solid #392f5a;
-  background-color: #fdf3e6;
 }
 
 .number-input {
@@ -50,7 +56,18 @@ li {
 .categories {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  text-align: center;
   margin: 10px 0;
+}
+
+.categories-description {
+  margin-top: 5px;
+}
+
+.checkbox-label {
+  display: flex;
+  height: 25px;
 }
 
 .checkbox:not(:checked),
@@ -59,16 +76,16 @@ li {
   left: -9999px;
 }
 
-.checkbox:not(:checked) + label,
-.checkbox:checked + label {
+.checkbox:not(:checked) + .checkbox-label,
+.checkbox:checked + .checkbox-label {
   position: relative;
   padding-left: 35px;
   margin-bottom: 10px;
   cursor: pointer;
 }
 
-.checkbox:not(:checked) + label:before,
-.checkbox:checked + label:before {
+.checkbox:not(:checked) + .checkbox-label:before,
+.checkbox:checked + .checkbox-label:before {
   content: '';
   position: absolute;
   left: 0;
@@ -76,15 +93,16 @@ li {
   width: 25px;
   height: 25px;
   border: 1px solid black;
-  background: #fff;
+  background: #ffffff;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
 }
 
-.checkbox:not(:checked) + label:after,
-.checkbox:checked + label:after {
+.checkbox:not(:checked) + .checkbox-label:after,
+.checkbox:checked + .checkbox-label:after {
   content: '';
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
   left: 6px;
   top: 6px;
   position: absolute;
@@ -92,63 +110,70 @@ li {
   transition: 0.1s;
 }
 
-.checkbox:not(:checked) + label:after {
+.checkbox:not(:checked) + .checkbox-label:after {
   transform: scale(0);
 }
 
-.host {
-  width: 100px;
-  height: 40px;
-  background-color: #392f5a;
-  color: #fff;
-  font-size: 1.8rem;
-  cursor: pointer;
-  border: 1px solid white;
-  transition: 0.15s;
-  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.5);
+.checkbox:checked:focus + .checkbox-label:before,
+.checkbox:not(:checked):focus + .checkbox-label:before {
+  border: 2px dashed black;
 }
 
-.host:hover, .host:focus {
+.btn {
+  padding: 10px 25px;
+  background-color: #392f5a;
+  color: #fff;
+  font-size: 1.6rem;
+  cursor: pointer;
+  border: 1px solid #ffffff;
+  transition: 0.15s;
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.5);
+  margin-bottom: 25px;
+}
+
+.btn:hover, .btn:focus {
   transform: translateY(2px);
   background-color: #4a4169;
   box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
 }
 
-.tr {
-  background-color: #d5ffff;
-}
-
 .table {
   width: 800px;
-  border: 2px solid #c0c0c0;
   border-collapse: collapse;
   padding: 5px;
+  margin-bottom: 20px;
 }
 
-.table th {
-  border: 2px solid #c0c0c0;
+.th {
+  border: 2px solid #392f5a;
   padding: 5px;
-  background: #f0f0f0;
+  background-color: #f3c545;
 }
 
-.table td {
-  border: 2px solid #c0c0c0;
-  width: 25%;
+.td {
+  border: 2px solid #392f5a;
   height: 30px;
   text-align: center;
+  background-color: #f5dd9c;
+}
+
+.word {
+  background-color: #ebebeb;
 }
 
 .word:hover, .word:focus, .word:active {
-  background-color: lightyellow;
+  background-color: #fffaed;
 }
 
 .info {
-  color: #d10000;
   text-align: center;
+  margin-bottom: 25px;
 }
 
 .players-header {
-  font-size: 16px;
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
 .container {
@@ -158,12 +183,26 @@ li {
   flex-direction: column;
 }
 
+.timer-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.timer {
+  margin: 15px 0;
+}
+
 .points.hl {
   font-weight: bold;
 }
 
 .letter {
   font-weight: bold;
+}
+
+.join-address {
+  margin-top: 20px;
 }
 
 .inactive {

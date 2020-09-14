@@ -23,8 +23,12 @@ io.on('connect', (socket) => {
     //May be do some authorization
 
     if (games[room]) {
+      //
+      if (games[room].hasStarted) {
+        socket.emit('hasStarted', games[room]);
+      }
+      //
       socket.join(room);
-      console.log(socket.id, 'joined', room);
       games[room]['words'][socket.id] = [];
 
       games[room]['players'][`${socket.id}`] = {
@@ -69,11 +73,11 @@ io.on('connect', (socket) => {
         },
       },
       words: { [socket.id]: [] },
-      readyPlayers: [],
       maxPlayers: maxPlayers,
       rounds: rounds,
       roundsCounter: 0,
       roundTime: time,
+      hasStarted: false,
     };
 
     console.dir(games, { depth: null });
@@ -90,21 +94,25 @@ io.on('connect', (socket) => {
   });
 
   socket.on('ready', ({ id, password }) => {
-    console.log('this player is ready', id);
-    const readyPlayers = games[password]['readyPlayers'];
+    console.log('password', password);
+    games[password]['players'][socket.id]['isReady'] = true;
+    io.to(password).emit('playerchange', games[password]);
 
-    if (!readyPlayers.includes(id)) {
-      readyPlayers.push(id);
-    }
+    const readyPlayers = Object.values(games[password].players)
+      .map((player) => player.isReady === true)
+      .filter((value) => value);
+
     console.log('readyPlayers', readyPlayers);
 
     if (readyPlayers.length == games[password]['maxPlayers']) {
+      games[password].hasStarted = true;
       const alphabet = 'ABCDEFGHIJKLMNOPRSTUWZ';
-      let r = alphabet[Math.floor(Math.random() * alphabet.length)];
+      let random = alphabet[Math.floor(Math.random() * alphabet.length)];
 
-      games[password]['letter'] = r;
+      games[password]['letter'] = random;
 
-      games[password]['readyPlayers'] = [];
+      Object.values(games[password].players).forEach((player) => (player.isReady = false));
+
       io.to(password).emit('start', { game: games[password], password: password }); // ewentualnie ify dodac u klienta
     }
   });
@@ -118,6 +126,8 @@ io.on('connect', (socket) => {
     console.log('wordlist', wordList);
     games[password]['words'][socket.id] = wordList;
 
+    games[password].players[socket.id].words = wordList;
+
     wordList.forEach((word) => {
       if (word != '---') {
         games[password]['players'][socket.id]['points'] += 10;
@@ -126,10 +136,7 @@ io.on('connect', (socket) => {
 
     const lengths = Object.values(games[password]['words']).filter((el) => Object.keys(el).length != 0).length;
 
-    console.log('lengths', lengths);
     if (lengths == Object.keys(games[password]['players']).length) {
-      console.log('spelniony if');
-      //
       games[password]['categories'].forEach((el, i) => {
         let words = [];
 
@@ -144,14 +151,17 @@ io.on('connect', (socket) => {
           });
         }
       });
-      //
 
-      //to na dole bylo nizej jak cos
       io.to(password).emit('playerchange', games[password]);
 
       games[password]['roundsCounter']++;
       if (games[password]['roundsCounter'] == games[password]['rounds']) {
         console.log('KONIEC GRY');
+        Object.values(games[password].players).forEach((player) => {
+          player.words = null;
+        });
+        io.to(password).emit('playerchange', games[password]);
+
         io.to(password).emit('endgame', games[password]['players']);
       }
 
@@ -172,11 +182,6 @@ const disconnect = (socket, game) => {
   } else {
     delete game['players'][socket.id];
 
-    const readyPlayers = game['readyPlayers'];
-    if (readyPlayers.includes(socket.id)) {
-      //tu zmiana (prztestowac)
-      readyPlayers.splice(readyPlayers.indexOf(socket.id, 1));
-    }
     io.to(game['id']).emit('playerchange', game);
   }
   console.log('usunieto', socket.id);

@@ -59,8 +59,8 @@ io.on('connect', (socket) => {
   });
 
   socket.on('host', ({ categories, maxPlayers, rounds, time }) => {
-    // const password = Math.floor(Math.random() * 901 + 100);
-    const password = 200;
+    const password = Math.floor(Math.random() * 901 + 100);
+    // const password = 200;
 
     socket.join(password);
     games[password] = {

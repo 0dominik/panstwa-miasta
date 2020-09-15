@@ -7,28 +7,9 @@ let password = '';
 
 const playersList = document.querySelector('.players-list');
 const players = document.querySelector('.players');
-const joinCodeEl = document.querySelector('.join-address');
+const joinAddress = document.querySelector('.join-address');
 
 socket.on('playerchange', (game) => {
-  playersList.innerHTML = `
-    ${Object.keys(game.words)
-      .map((el) => {
-        if (game.words[el].length != 0) {
-          if (el == socket.id) {
-            return `<li class="points hl">[YOU]${game['players'][el]['name']}: ${game['players'][el]['points']} points, last words: ${game.words[el]}</li>`;
-          } else {
-            return `<li class="points">${game['players'][el]['name']}: ${game['players'][el]['points']} points, last words: ${game.words[el]}</li>`;
-          }
-        } else {
-          if (el == socket.id) {
-            return `<li class="points hl">[YOU]${game['players'][el]['name']}: ${game['players'][el]['points']} points</li>`;
-          } else {
-            return `<li class="points">${game['players'][el]['name']}: ${game['players'][el]['points']} points</li>`;
-          }
-        }
-      })
-      .join('')}`;
-
   const players = game.players;
 
   playersList.innerHTML = `
@@ -151,25 +132,23 @@ socket.on('updatePoints', (data) => {
   }
 });
 
-socket.on('endgame', (data) => {
+socket.on('endgame', (players) => {
   info.classList.remove('inactive');
   timerContainer.classList.add('inactive');
   table.classList.add('inactive');
   doneBtn.classList.add('inactive');
-  joinCodeEl.classList.add('inactive');
-  const playersHeader = document.querySelector('.players-header');
-  playersHeader.classList.add('inactive');
+  joinAddress.classList.add('inactive');
 
   const points = [];
 
-  Object.keys(data).forEach((el) => {
-    points.push(data[el]['points']);
+  Object.keys(players).forEach((el) => {
+    points.push(players[el]['points']);
   });
 
   const winner = [];
 
-  Object.keys(data).forEach((el) => {
-    if (data[el]['points'] == Math.max(...points)) {
+  Object.keys(players).forEach((el) => {
+    if (players[el]['points'] == Math.max(...points)) {
       winner.push(el);
     }
   });

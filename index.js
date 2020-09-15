@@ -44,10 +44,12 @@ io.on('connect', (socket) => {
       socket.emit('prepareGame', { game: games[room], room: room });
 
       socket.on('disconnect', () => {
-        socket.leave(room);
-        delete games[room]['words'][socket.id];
-        delete games[room]['players'][socket.id];
-        disconnect(socket, games[room]);
+        if (games[room]) {
+          socket.leave(room);
+          delete games[room]['words'][socket.id];
+          delete games[room]['players'][socket.id];
+          disconnect(socket, games[room]);
+        }
       });
 
       var kupa = Object.keys(io.sockets.adapter.rooms[room].sockets);
@@ -59,8 +61,8 @@ io.on('connect', (socket) => {
   });
 
   socket.on('host', ({ categories, maxPlayers, rounds, time }) => {
-    const password = Math.floor(Math.random() * 901 + 100);
-    // const password = 200;
+    // const password = Math.floor(Math.random() * 901 + 100);
+    const password = 200;
 
     socket.join(password);
     games[password] = {
@@ -86,10 +88,12 @@ io.on('connect', (socket) => {
     socket.emit('playerchange', games[password]);
 
     socket.on('disconnect', () => {
-      socket.leave(password);
-      delete games[password]['words'][socket.id];
-      delete games[password]['players'][socket.id];
-      disconnect(socket, games[password]);
+      if (games[password]) {
+        socket.leave(password);
+        delete games[password]['words'][socket.id];
+        delete games[password]['players'][socket.id];
+        disconnect(socket, games[password]);
+      }
     });
   });
 
@@ -152,18 +156,23 @@ io.on('connect', (socket) => {
         }
       });
 
-      io.to(password).emit('playerchange', games[password]);
-
       games[password]['roundsCounter']++;
       if (games[password]['roundsCounter'] == games[password]['rounds']) {
         console.log('KONIEC GRY');
         Object.values(games[password].players).forEach((player) => {
           player.words = null;
+          console.log('po koniec gry player.words', player.words);
         });
+
+        console.log('games po koneic gry');
+        console.dir(games, { depth: null });
+
         io.to(password).emit('playerchange', games[password]);
 
-        io.to(password).emit('endgame', games[password]['players']);
+        // io.to(password).emit('endgame', games[password]['players']);
       }
+
+      io.to(password).emit('playerchange', games[password]);
 
       socket.on('deleteGame', () => {
         socket.leave(password);

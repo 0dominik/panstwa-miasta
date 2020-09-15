@@ -7,6 +7,7 @@ socket.on('prepareGame', ({ game, room }) => {
   password = room;
   info.classList.add('inactive');
   table.innerHTML = createTable(game.categories);
+  joinAddress.innerText = `Join address: ${window.location.href}`;
   timerContainer.classList.remove('inactive');
   timer.textContent = `0${game['roundTime'] / 60}:00`;
 });
@@ -14,7 +15,7 @@ socket.on('prepareGame', ({ game, room }) => {
 socket.on('wrongRoom', () => {
   players.classList.add('inactive');
   info.classList.remove('inactive');
-  info.textContent = 'Wrong address. Try another or create a new room.';
+  info.textContent = 'Wrong address or game ended. Try another one or create a new room.';
 });
 //
 socket.on('hasStarted', (game) => {

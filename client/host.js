@@ -33,7 +33,7 @@ socket.on('setcode', (data) => {
     window.history.pushState('', '', `/${data.password}`);
     const players = document.querySelector('.players');
     players.classList.remove('inactive');
-    joinCodeEl.innerText = `Join address: ${window.location.href}`;
+    joinAddress.innerText = `Join address: ${window.location.href}`;
     password = data.password;
     timer.textContent = `0${data.roundTime / 60}:00`;
   }

@@ -3,11 +3,10 @@ socket.emit('joinroom', location.pathname.substring(1));
 const table = document.querySelector('.table');
 const timerContainer = document.querySelector('.timer-container');
 
-let password = '';
-
 const playersList = document.querySelector('.players-list');
 const players = document.querySelector('.players');
 const joinAddress = document.querySelector('.join-address');
+const info = document.querySelector('.info');
 
 socket.on('playerchange', (game) => {
   const players = game.players;
@@ -33,13 +32,13 @@ const readyBtn = document.querySelector('.start-btn');
 
 readyBtn.addEventListener('click', () => {
   readyBtn.textContent = 'Waiting for other players...';
-  socket.emit('ready', { id: socket.id, password: location.pathname.substring(1) });
+  socket.emit('ready', location.pathname.substring(1));
 });
 
 const letter = document.querySelector('.letter');
 const letterContainer = document.querySelector('.letter-container');
 
-socket.on('start', ({ game, password }) => {
+socket.on('start', ({ game, code }) => {
   readyBtn.classList.add('inactive');
   readyBtn.textContent = 'Press if ready';
   info.classList.remove('inactive');
@@ -51,58 +50,57 @@ socket.on('start', ({ game, password }) => {
   info.innerHTML = `
       <h2>GAME INFO</h2>
       <ul>
-        <li class="round">rounds: ${game['roundsCounter'] + 1}/${game['rounds']}</li>  
-        <li>round time: ${game['roundTime']} seconds</li>  
-        <li>password: ${game['id']}</li>  
-        <li>max players: ${game['maxPlayers']}</li>
+        <li class="round">rounds: ${game.roundsCounter + 1}/${game.rounds}</li>  
+        <li>round time: ${game.roundTime} seconds</li>  
+        <li>max players: ${game.playersNumber}</li>
       </ul>`;
 
   const tbody = document.querySelector('.tbody');
   tbody.innerHTML += `<tr class="tr">
       <td class="td">${game.letter}</td>
-      ${'<td class="td word" contenteditable></td>'.repeat(game['categories'].length)}
+      ${'<td class="td word" contenteditable></td>'.repeat(game.categories.length)}
     </tr>`;
 
-  startTimer(game['roundTime'], timer, password);
+  const startTimer = (duration, display, code) => {
+    let time = duration;
+    let minutes;
+    let seconds;
+    const timer = () => {
+      minutes = parseInt(time / 60, 10);
+      seconds = parseInt(time % 60, 10);
+
+      minutes = minutes < 10 ? `0${minutes}` : minutes;
+      seconds = seconds < 10 ? `0${seconds}` : seconds;
+
+      display.textContent = `${minutes}:${seconds}`;
+
+      if (--time < 0) {
+        time = duration;
+        socket.emit('endround', code);
+      }
+    };
+    socket.on('endround', () => {
+      clearInterval(interval);
+    });
+    const interval = setInterval(timer, 1000);
+  };
+
+  startTimer(game.roundTime, timer, code);
   letter.textContent = game.letter;
+
+  doneBtn.addEventListener('click', () => {
+    socket.emit('endround', code);
+  });
 });
 
 const timer = document.querySelector('.timer');
 
-function startTimer(duration, display, password) {
-  let time = duration;
-  let minutes;
-  let seconds;
-  const timer = () => {
-    minutes = parseInt(time / 60, 10);
-    seconds = parseInt(time % 60, 10);
-
-    minutes = minutes < 10 ? `0${minutes}` : minutes;
-    seconds = seconds < 10 ? `0${seconds}` : seconds;
-
-    display.textContent = `${minutes}:${seconds}`;
-
-    if (--time < 0) {
-      time = duration;
-      socket.emit('endround', password);
-    }
-  };
-  socket.on('endround', () => {
-    clearInterval(interval);
-  });
-  const interval = setInterval(timer, 1000);
-}
-
-doneBtn.addEventListener('click', () => {
-  socket.emit('endround', password);
-});
-
-socket.on('endround', (data) => {
+socket.on('endround', (code) => {
   const words = document.querySelectorAll('.word');
   doneBtn.classList.add('inactive');
   let wordList = [];
 
-  const x = [...words].forEach((el) => {
+  [...words].forEach((el) => {
     if (el.textContent != '' && el.textContent[0].toUpperCase() == letter.textContent) {
       wordList.push(el.textContent.toLowerCase());
     } else {
@@ -111,7 +109,7 @@ socket.on('endround', (data) => {
   });
 
   if (wordList.length != 0) {
-    socket.emit('wordlist', { password: password, wordList: wordList });
+    socket.emit('wordlist', { code: code, wordList: wordList });
   }
 
   words.forEach((el) => {
@@ -119,20 +117,11 @@ socket.on('endround', (data) => {
     el.setAttribute('contenteditable', 'false');
   });
 
-  socket.emit('playerchange', password);
+  socket.emit('playerchange', code);
   readyBtn.classList.remove('inactive');
 });
 
-socket.on('updatePoints', (data) => {
-  if (password) {
-    const points = document.querySelectorAll('.points-number');
-    Object.keys(data).forEach((el, i) => {
-      points[i].textContent = data[el]['points'];
-    });
-  }
-});
-
-socket.on('endgame', (players) => {
+socket.on('endgame', ({ players, code }) => {
   info.classList.remove('inactive');
   timerContainer.classList.add('inactive');
   table.classList.add('inactive');
@@ -142,13 +131,13 @@ socket.on('endgame', (players) => {
   const points = [];
 
   Object.keys(players).forEach((el) => {
-    points.push(players[el]['points']);
+    points.push(players[el].points);
   });
 
   const winner = [];
 
   Object.keys(players).forEach((el) => {
-    if (players[el]['points'] == Math.max(...points)) {
+    if (players[el].points == Math.max(...points)) {
       winner.push(el);
     }
   });
@@ -157,7 +146,7 @@ socket.on('endgame', (players) => {
 
   info.textContent = `GAME ENDED! The ${form} ${winner}`;
 
-  socket.emit('deleteGame', password);
+  socket.emit('deleteGame', code);
 });
 
 const createTable = (cat) => {

@@ -4,7 +4,6 @@ const container = document.querySelector('.container');
 const host = document.querySelector('.host');
 let categories = [];
 const checkbox = document.querySelectorAll('.checkbox');
-const info = document.querySelector('.info');
 const maxPlayers = document.querySelector('.players-number');
 const rounds = document.querySelector('.round-input');
 const roundTime = document.querySelector('.round-time');
@@ -24,17 +23,15 @@ host.addEventListener('click', (e) => {
     timerContainer.classList.remove('inactive');
     timerContainer.classList.remove('inactive');
     table.innerHTML = createTable(categories);
-    socket.emit('host', { categories: categories, maxPlayers: maxPlayers.value, rounds: rounds.value, time: roundTime.value });
+    socket.emit('host', { categories: categories, playersNumber: maxPlayers.value, rounds: rounds.value, time: roundTime.value });
   }
 });
 
-socket.on('setcode', (data) => {
-  if (data.id == socket.id) {
-    window.history.pushState('', '', `/${data.password}`);
-    const players = document.querySelector('.players');
+socket.on('setcode', ({ code, id, roundTime }) => {
+  if (id == socket.id) {
+    window.history.pushState('', '', `/${code}`);
     players.classList.remove('inactive');
     joinAddress.innerText = `Join address: ${window.location.href}`;
-    password = data.password;
-    timer.textContent = `0${data.roundTime / 60}:00`;
+    // timer.textContent = `0${roundTime / 60}:00`;
   }
 });

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Scattergories</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="/styles/style.css" />
   </head>
   <body>
     <h1 class="logo">Scattergories game</h1>
@@ -17,7 +17,7 @@
     <div class="timer-container inactive">
       <p class="letter-container">Letter: <span class="letter">-</span></p>
       <p class="timer">00:00</p>
-      <button class="btn start-btn">Press if ready</button>
+      <button class="btn ready-btn">Press if ready</button>
     </div>
 
     <button class="btn done-btn inactive">I've finished</button>
@@ -30,7 +30,7 @@
     <p class="join-address"></p>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-    <script src="/join.js"></script>
-    <script src="/game.js"></script>
+    <script src="./js/join.js"></script>
+    <script src="./js/game.js"></script>
   </body>
 </html>

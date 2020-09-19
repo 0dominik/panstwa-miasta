@@ -7,10 +7,10 @@ const PORT = process.env.PORT || 4002;
 const server = app.listen(PORT, () => {
   console.log('listening to reqest on port 4002');
 });
+
 app.use(express.static('./client'));
 
 app.get(/(^\/[0-9]+$)/, function (req, res) {
-  //Matches anything with alphabets,numbers and hyphen without trailing slash
   res.sendFile(__dirname + '/client/join.html');
 });
 
@@ -19,32 +19,34 @@ const io = socket(server);
 const games = {};
 
 io.on('connect', (socket) => {
-  socket.on('joinroom', function (room) {
-    if (games[room]) {
+  socket.on('joinroom', function (code) {
+    const game = games[code];
+    if (game && game.playersNumber > Object.keys(game.players).length) {
       //
-      if (games[room].hasStarted) {
-        socket.emit('hasStarted', games[room]);
+      console.log('tocos', Object.keys(game.players).length);
+      if (game.hasStarted) {
+        socket.emit('hasStarted', game);
       }
       //
-      socket.join(room);
-      games[room].words[socket.id] = [];
+      socket.join(code);
+      game.words[socket.id] = [];
 
-      games[room].players[`${socket.id}`] = {
+      game.players[`${socket.id}`] = {
         points: 0,
         name: socket.id,
       };
 
-      io.to(room).emit('playerchange', games[room]);
+      io.to(code).emit('playerchange', game);
 
       console.log('games');
       console.dir(games, { depth: null });
 
-      socket.emit('prepareGame', games[room]);
+      socket.emit('prepareGame', game);
 
       socket.on('disconnect', () => {
-        disconnect(socket, games[room]);
+        disconnect(socket, game);
       });
-    } else if (room == '') {
+    } else if (code == '') {
       console.log('jestes na /');
     } else {
       socket.emit('wrongRoom');
@@ -76,91 +78,106 @@ io.on('connect', (socket) => {
       checkDuplicatesCounter: 0,
     };
 
+    const game = games[code];
+
     console.dir(games, { depth: null });
 
-    socket.emit('setcode', { code: code, id: socket.id, roundTime: games[code].roundTime });
-    socket.emit('playerchange', games[code]);
+    socket.emit('setcode', { code: code, id: socket.id, roundTime: game.roundTime });
+    socket.emit('playerchange', game);
 
     socket.on('disconnect', () => {
-      disconnect(socket, games[code]);
-      delete games[code];
+      disconnect(socket, game);
+      delete game;
     });
   });
 
   socket.on('ready', (code) => {
-    games[code].players[socket.id].isReady = true;
-    io.to(code).emit('playerchange', games[code]);
+    const game = games[code];
 
-    const readyPlayers = Object.values(games[code].players)
-      .map((player) => player.isReady === true)
-      .filter((value) => value);
+    try {
+      game.players[socket.id].isReady = true;
+      io.to(code).emit('playerchange', game);
 
-    console.log('readyPlayers', readyPlayers);
+      const readyPlayers = Object.values(game.players)
+        .map((player) => player.isReady === true)
+        .filter((value) => value);
 
-    if (readyPlayers.length == games[code].playersNumber) {
-      games[code].hasStarted = true;
-      const alphabet = games[code].alphabet;
-      let random = alphabet[Math.floor(Math.random() * alphabet.length)];
+      console.log('readyPlayers', readyPlayers);
 
-      games[code].alphabet = alphabet.replace(random, '');
-      games[code].letter = random;
+      if (readyPlayers.length == game.playersNumber) {
+        game.hasStarted = true;
+        const alphabet = game.alphabet;
+        let random = alphabet[Math.floor(Math.random() * alphabet.length)];
 
-      Object.values(games[code].players).forEach((player) => (player.isReady = false));
+        game.alphabet = alphabet.replace(random, '');
+        game.letter = random;
 
-      io.to(code).emit('start', { game: games[code], code: code });
+        Object.values(game.players).forEach((player) => (player.isReady = false));
+
+        io.to(code).emit('start', { game: game, code: code });
+      }
+    } catch {
+      console.log('error');
     }
   });
 
   socket.on('endround', (code) => {
-    io.to(code).emit('endround', code); //TU SIĘ SKUPIĆ
+    io.to(code).emit('getWords', code);
   });
 
   socket.on('wordlist', ({ wordList, code }) => {
-    games[code].checkDuplicatesCounter++;
-    games[code].words[socket.id] = wordList;
+    const game = games[code];
 
-    games[code].players[socket.id].words = wordList;
+    game.checkDuplicatesCounter++;
+    game.words[socket.id] = wordList;
+
+    game.players[socket.id].words = wordList;
 
     wordList.forEach((word) => {
       if (word != '---') {
-        games[code].players[socket.id].points += 10;
+        game.players[socket.id].points += 10;
       }
     });
 
-    if (games[code].checkDuplicatesCounter == Object.keys(games[code].players).length) {
+    if (game.checkDuplicatesCounter == Object.keys(game.players).length) {
       // sprawdzamy duplikaty, jeśli są wszystkie słowa
-      games[code].checkDuplicatesCounter = 0;
+      game.checkDuplicatesCounter = 0;
 
-      games[code].categories.forEach((el, i) => {
+      game.categories.forEach((el, i) => {
         let words = [];
 
-        Object.values(games[code].words).forEach((el) => words.push(el[i]));
+        Object.values(game.words).forEach((el) => words.push(el[i]));
 
         const duplicates = words.getDuplicates();
 
-        if (Object.keys(duplicates).length != 0 && !duplicates['---']) {
-          Object.values(duplicates)[0].forEach((index) => {
-            //moze to [0] zle
-            games[code].players[Object.keys(games[code].players)[index]].points -= 5;
+        // if (Object.keys(duplicates).length != 0 && !duplicates['---']) {
+        //   Object.values(duplicates)[0].forEach((index) => {
+        //     game.players[Object.keys(game.players)[index]].points -= 5;
+        //   });
+        // }
+        console.log('duplicates', duplicates);
+        if (duplicates.length > 1) {
+          duplicates.forEach((index) => {
+            game.players[Object.keys(game.players)[index]].points -= 5;
           });
         }
       });
 
-      games[code].roundsCounter++;
-      if (games[code].roundsCounter == games[code].rounds) {
+      game.roundsCounter++;
+      if (game.roundsCounter == game.rounds) {
         console.log('KONIEC GRY');
-        Object.keys(games[code].players).forEach((player) => {
-          games[code].players[player].words = null;
+        Object.keys(game.players).forEach((player) => {
+          game.players[player].words = null;
         });
 
-        io.to(code).emit('endgame', { players: games[code].players, code: code });
+        io.to(code).emit('endgame', { players: game.players, code: code });
       }
 
-      io.to(code).emit('playerchange', games[code]);
+      io.to(code).emit('playerchange', game);
 
       socket.on('deleteGame', () => {
         socket.leave(code);
-        delete games[code];
+        delete game;
       });
     }
 
@@ -180,13 +197,25 @@ const disconnect = (socket, game) => {
   }
 };
 
+// Array.prototype.getDuplicates = function () {
+//   var duplicates = {};
+//   for (let i = 0; i < this.length; i++) {
+//     if (duplicates.hasOwnProperty(this[i])) {
+//       duplicates[this[i]].push(i);
+//     } else if (this.lastIndexOf(this[i]) !== i) {
+//       duplicates[this[i]] = [i];
+//     }
+//   }
+//   return duplicates;
+// };
+
 Array.prototype.getDuplicates = function () {
-  var duplicates = {};
+  var duplicates = [];
   for (let i = 0; i < this.length; i++) {
-    if (duplicates.hasOwnProperty(this[i])) {
-      duplicates[this[i]].push(i);
-    } else if (this.lastIndexOf(this[i]) !== i) {
-      duplicates[this[i]] = [i];
+    console.log('this', this);
+
+    if (this.filter((el) => el != this[i]).length < this.length - 1 && this[i] !== '---') {
+      duplicates.push(i);
     }
   }
   return duplicates;

@@ -28,11 +28,14 @@ socket.on('playerchange', (game) => {
 
 const doneBtn = document.querySelector('.done-btn');
 const incorrectCode = document.querySelector('.incorrect');
-const readyBtn = document.querySelector('.start-btn');
+const readyBtn = document.querySelector('.ready-btn');
 
 readyBtn.addEventListener('click', () => {
-  readyBtn.textContent = 'Waiting for other players...';
-  socket.emit('ready', location.pathname.substring(1));
+  const code = location.pathname.substring(1);
+  if (code) {
+    readyBtn.textContent = 'Waiting for other players...';
+    socket.emit('ready', location.pathname.substring(1));
+  }
 });
 
 const letter = document.querySelector('.letter');
@@ -79,7 +82,7 @@ socket.on('start', ({ game, code }) => {
         socket.emit('endround', code);
       }
     };
-    socket.on('endround', () => {
+    socket.on('getWords', () => {
       clearInterval(interval);
     });
     const interval = setInterval(timer, 1000);
@@ -95,7 +98,7 @@ socket.on('start', ({ game, code }) => {
 
 const timer = document.querySelector('.timer');
 
-socket.on('endround', (code) => {
+socket.on('getWords', (code) => {
   const words = document.querySelectorAll('.word');
   doneBtn.classList.add('inactive');
   let wordList = [];

@@ -4,7 +4,7 @@ const container = document.querySelector('.container');
 const host = document.querySelector('.host');
 let categories = [];
 const checkbox = document.querySelectorAll('.checkbox');
-const maxPlayers = document.querySelector('.players-number');
+const playersNumber = document.querySelector('.players-number');
 const rounds = document.querySelector('.round-input');
 const roundTime = document.querySelector('.round-time');
 
@@ -23,7 +23,7 @@ host.addEventListener('click', (e) => {
     timerContainer.classList.remove('inactive');
     timerContainer.classList.remove('inactive');
     table.innerHTML = createTable(categories);
-    socket.emit('host', { categories: categories, playersNumber: maxPlayers.value, rounds: rounds.value, time: roundTime.value });
+    socket.emit('host', { categories: categories, playersNumber: playersNumber.value, rounds: rounds.value, time: roundTime.value });
   }
 });
 

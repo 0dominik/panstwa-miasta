@@ -1,4 +1,4 @@
-socket.emit('joinroom', location.pathname.substring(1));
+// socket.emit('joinroom', location.pathname.substring(1));
 
 const table = document.querySelector('.table');
 const timerContainer = document.querySelector('.timer-container');
@@ -55,7 +55,7 @@ socket.on('start', ({ game, code }) => {
       <ul>
         <li class="round">rounds: ${game.roundsCounter + 1}/${game.rounds}</li>  
         <li>round time: ${game.roundTime} seconds</li>  
-        <li>max players: ${game.playersNumber}</li>
+        <li>players: ${game.playersNumber}</li>
       </ul>`;
 
   const tbody = document.querySelector('.tbody');
@@ -103,9 +103,9 @@ socket.on('getWords', (code) => {
   doneBtn.classList.add('inactive');
   let wordList = [];
 
-  [...words].forEach((el) => {
-    if (el.textContent != '' && el.textContent[0].toUpperCase() == letter.textContent) {
-      wordList.push(el.textContent.toLowerCase());
+  words.forEach((word) => {
+    if (word.textContent != '' && word.textContent[0].toUpperCase() == letter.textContent) {
+      wordList.push(word.textContent.toLowerCase());
     } else {
       wordList.push('---');
     }
@@ -115,9 +115,9 @@ socket.on('getWords', (code) => {
     socket.emit('wordlist', { code: code, wordList: wordList });
   }
 
-  words.forEach((el) => {
-    el.classList.remove('word');
-    el.setAttribute('contenteditable', 'false');
+  words.forEach((word) => {
+    word.classList.remove('word');
+    word.setAttribute('contenteditable', 'false');
   });
 
   socket.emit('playerchange', code);
@@ -146,7 +146,6 @@ socket.on('endgame', ({ players, code }) => {
   });
 
   const form = winner.length > 1 ? 'winners are' : 'winner is';
-
   info.textContent = `GAME ENDED! The ${form} ${winner}`;
 
   socket.emit('deleteGame', code);

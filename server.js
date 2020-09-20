@@ -19,11 +19,12 @@ const io = socket(server);
 const games = {};
 
 io.on('connect', (socket) => {
-  socket.on('joinroom', function (code) {
+  socket.on('joinroom', (code) => {
     const game = games[code];
+    console.log('io.sockets', socket.rooms);
+    console.log('wykonalo sie joinroom');
     if (game && game.playersNumber > Object.keys(game.players).length) {
       //
-      console.log('tocos', Object.keys(game.players).length);
       if (game.hasStarted) {
         socket.emit('hasStarted', game);
       }
@@ -86,8 +87,13 @@ io.on('connect', (socket) => {
     socket.emit('playerchange', game);
 
     socket.on('disconnect', () => {
+      //delete game if host leaves
       disconnect(socket, game);
-      delete game;
+      delete games[code];
+
+      if (io.sockets.adapter.rooms[code]) {
+        io.sockets.adapter.rooms[code].sockets = {};
+      }
     });
   });
 
@@ -148,13 +154,8 @@ io.on('connect', (socket) => {
 
         Object.values(game.words).forEach((el) => words.push(el[i]));
 
-        const duplicates = words.getDuplicates();
+        const duplicates = getDuplicates(words);
 
-        // if (Object.keys(duplicates).length != 0 && !duplicates['---']) {
-        //   Object.values(duplicates)[0].forEach((index) => {
-        //     game.players[Object.keys(game.players)[index]].points -= 5;
-        //   });
-        // }
         console.log('duplicates', duplicates);
         if (duplicates.length > 1) {
           duplicates.forEach((index) => {
@@ -197,24 +198,10 @@ const disconnect = (socket, game) => {
   }
 };
 
-// Array.prototype.getDuplicates = function () {
-//   var duplicates = {};
-//   for (let i = 0; i < this.length; i++) {
-//     if (duplicates.hasOwnProperty(this[i])) {
-//       duplicates[this[i]].push(i);
-//     } else if (this.lastIndexOf(this[i]) !== i) {
-//       duplicates[this[i]] = [i];
-//     }
-//   }
-//   return duplicates;
-// };
-
-Array.prototype.getDuplicates = function () {
+const getDuplicates = (array) => {
   var duplicates = [];
-  for (let i = 0; i < this.length; i++) {
-    console.log('this', this);
-
-    if (this.filter((el) => el != this[i]).length < this.length - 1 && this[i] !== '---') {
+  for (let i = 0; i < array.length; i++) {
+    if (array.filter((el) => el != array[i]).length < array.length - 1 && array[i] !== '---') {
       duplicates.push(i);
     }
   }

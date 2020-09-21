@@ -21,8 +21,6 @@ const games = {};
 io.on('connect', (socket) => {
   socket.on('joinroom', (code) => {
     const game = games[code];
-    console.log('io.sockets', socket.rooms);
-    console.log('wykonalo sie joinroom');
     if (game && game.playersNumber > Object.keys(game.players).length) {
       //
       if (game.hasStarted) {
@@ -56,8 +54,8 @@ io.on('connect', (socket) => {
   });
 
   socket.on('host', ({ categories, playersNumber, rounds, time }) => {
-    // const code = Math.floor(Math.random() * 901 + 100);
-    const code = 200;
+    const code = Math.floor(Math.random() * 901 + 100);
+    // const code = 200;
 
     socket.join(code);
     games[code] = {

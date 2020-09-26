@@ -54,8 +54,8 @@ io.on('connect', (socket) => {
   });
 
   socket.on('host', ({ categories, playersNumber, rounds, time }) => {
-    const code = Math.floor(Math.random() * 901 + 100);
-    // const code = 200;
+    // const code = Math.floor(Math.random() * 901 + 100);
+    const code = 200;
 
     socket.join(code);
     games[code] = {
@@ -126,7 +126,7 @@ io.on('connect', (socket) => {
   });
 
   socket.on('endround', (code) => {
-    io.to(code).emit('getWords', code);
+    io.to(code).emit('getWords', games[code]);
   });
 
   socket.on('wordlist', ({ wordList, code }) => {
@@ -154,7 +154,6 @@ io.on('connect', (socket) => {
 
         const duplicates = getDuplicates(words);
 
-        console.log('duplicates', duplicates);
         if (duplicates.length > 1) {
           duplicates.forEach((index) => {
             game.players[Object.keys(game.players)[index]].points -= 5;

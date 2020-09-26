@@ -4,7 +4,7 @@ socket.emit('joinroom', location.pathname.substring(1));
 
 socket.on('prepareGame', (game) => {
   info.classList.add('inactive');
-  table.innerHTML = createTable(game.categories);
+  // table.innerHTML = createTable(game.categories);
   joinAddress.innerText = `Join address: ${window.location.href}`;
   timerContainer.classList.remove('inactive');
   // timer.textContent = `0${game.roundTime / 60}:00`;

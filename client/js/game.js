@@ -58,11 +58,7 @@ socket.on('start', ({ game, code }) => {
         <li>players: ${game.playersNumber}</li>
       </ul>`;
 
-  const tbody = document.querySelector('.tbody');
-  tbody.innerHTML += `<tr class="tr">
-      <td class="td">${game.letter}</td>
-      ${'<td class="td word" contenteditable></td>'.repeat(game.categories.length)}
-    </tr>`;
+  table.innerHTML += newCreateTable(game.categories, game.letter, game.roundsCounter);
 
   const startTimer = (duration, display, code) => {
     let time = duration;
@@ -72,7 +68,6 @@ socket.on('start', ({ game, code }) => {
       minutes = parseInt(time / 60, 10);
       seconds = parseInt(time % 60, 10);
 
-      minutes = minutes < 10 ? `0${minutes}` : minutes;
       seconds = seconds < 10 ? `0${seconds}` : seconds;
 
       display.textContent = `${minutes}:${seconds}`;
@@ -98,29 +93,32 @@ socket.on('start', ({ game, code }) => {
 
 const timer = document.querySelector('.timer');
 
-socket.on('getWords', (code) => {
-  const words = document.querySelectorAll('.word');
+socket.on('getWords', (game) => {
+  const [...words] = document.querySelectorAll('.word-input');
+  words.length = game.categories.length; //prevent adding inputs by player
   doneBtn.classList.add('inactive');
   let wordList = [];
 
-  words.forEach((word) => {
-    if (word.textContent != '' && word.textContent[0].toUpperCase() == letter.textContent) {
-      wordList.push(word.textContent.toLowerCase());
+  words.forEach((wordInput) => {
+    const word = wordInput.value;
+    if (word != '' && word[0].toUpperCase() == game.letter) {
+      wordList.push(word.toLowerCase());
     } else {
       wordList.push('---');
     }
   });
 
   if (wordList.length != 0) {
-    socket.emit('wordlist', { code: code, wordList: wordList });
+    socket.emit('wordlist', { code: game.id, wordList: wordList });
   }
 
-  words.forEach((word) => {
-    word.classList.remove('word');
-    word.setAttribute('contenteditable', 'false');
+  //remove inputs and put its value to table
+  words.forEach((wordInput) => {
+    wordInput.parentNode.textContent = wordInput.value;
+    wordInput.remove();
   });
 
-  socket.emit('playerchange', code);
+  socket.emit('playerchange', game.id);
   readyBtn.classList.remove('inactive');
 });
 
@@ -151,7 +149,7 @@ socket.on('endgame', ({ players, code }) => {
   socket.emit('deleteGame', code);
 });
 
-const createTable = (cat) => {
+const createTable = (cat, letter) => {
   return `
   <thead>
   <tr>
@@ -164,4 +162,45 @@ const createTable = (cat) => {
   </tr>
   </tbody>
   `;
+};
+
+const newCreateTable = (cat, letter, round) => {
+  if (round === 0) {
+    return `
+      <div class="row">
+        <div class="column">
+          <span class="category-label">letter</span>
+          <div class="input-container">${letter}</div>
+        </div>
+        ${cat
+          .map(
+            (el) => `
+        <div class="column">
+          <label class="category-label" for="${el}-category">${el}</label>
+          <div class="input-container">
+            <input id="${el}-category" class="word-input" type="text" />
+          </div>
+        </div>`
+          )
+          .join('')}
+      </div>`;
+  } else {
+    return `
+      <div class="row">
+        <div class="column">
+          <div class="input-container">${letter}</div>
+        </div>
+        ${cat
+          .map(
+            (el) => `
+        <div class="column">
+          <div class="input-container">
+            <input id="${el}-category" class="word-input" type="text" />
+          </div>
+        </div>
+        `
+          )
+          .join('')}
+      </div>`;
+  }
 };

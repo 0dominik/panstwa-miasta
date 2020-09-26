@@ -22,7 +22,7 @@ host.addEventListener('click', (e) => {
     container.classList.add('inactive');
     timerContainer.classList.remove('inactive');
     timerContainer.classList.remove('inactive');
-    table.innerHTML = createTable(categories);
+    // table.innerHTML = createTable(categories);
     socket.emit('host', { categories: categories, playersNumber: playersNumber.value, rounds: rounds.value, time: roundTime.value });
   }
 });

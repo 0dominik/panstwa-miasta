@@ -1,19 +1,20 @@
 const socket = io();
 
-const container = document.querySelector('.container');
+const container = document.querySelector('.host-container');
 const host = document.querySelector('.host');
 let categories = [];
-const checkbox = document.querySelectorAll('.checkbox');
+const checkboxes = document.querySelectorAll('.checkbox');
 const playersNumber = document.querySelector('.players-number');
-const rounds = document.querySelector('.round-input');
+const roundsNumber = document.querySelector('.round-input');
 const roundTime = document.querySelector('.round-time');
+const playersContainer = document.querySelector('.players');
 
-host.addEventListener('click', (e) => {
-  checkbox.forEach((el) => {
-    return el.checked ? categories.push(el.id) : null;
+host.addEventListener('click', () => {
+  checkboxes.forEach((checkbox) => {
+    return checkbox.checked ? categories.push(checkbox.id) : null;
   });
 
-  if (categories.length < 2 || rounds.value < 1 || rounds.value > 10) {
+  if (categories.length < 2 || roundsNumber.value < 1 || roundsNumber.value > 10) {
     info.textContent = 'Select at least 2 categories and enter number of rounds between 1 and 10!';
     info.classList.remove('inactive');
     categories = [];
@@ -22,16 +23,14 @@ host.addEventListener('click', (e) => {
     container.classList.add('inactive');
     timerContainer.classList.remove('inactive');
     timerContainer.classList.remove('inactive');
-    // table.innerHTML = createTable(categories);
-    socket.emit('host', { categories: categories, playersNumber: playersNumber.value, rounds: rounds.value, time: roundTime.value });
+    socket.emit('host', { categories: categories, playersNumber: playersNumber.value, rounds: roundsNumber.value, time: roundTime.value });
   }
 });
 
 socket.on('setcode', ({ code, id, roundTime }) => {
   if (id == socket.id) {
     window.history.pushState('', '', `/${code}`);
-    players.classList.remove('inactive');
+    playersContainer.classList.remove('inactive');
     joinAddress.innerText = `Join address: ${window.location.href}`;
-    // timer.textContent = `0${roundTime / 60}:00`;
   }
 });

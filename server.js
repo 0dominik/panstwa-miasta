@@ -5,13 +5,13 @@ const app = express();
 const PORT = process.env.PORT || 4002;
 
 const server = app.listen(PORT, () => {
-  console.log('listening to reqest on port 4002');
+  console.log('listening to request on port 4002');
 });
 
 app.use(express.static('./client'));
 
-app.get(/(^\/[0-9]+$)/, function (req, res) {
-  res.sendFile(__dirname + '/client/join.html');
+app.get(/(^\/[0-9]+$)/, (req, res) => {
+  res.sendFile(__dirname + '/client/index.html');
 });
 
 const io = socket(server);
@@ -22,11 +22,6 @@ io.on('connect', (socket) => {
   socket.on('joinroom', (code) => {
     const game = games[code];
     if (game && game.playersNumber > Object.keys(game.players).length) {
-      //
-      if (game.hasStarted) {
-        socket.emit('hasStarted', game);
-      }
-      //
       socket.join(code);
       game.words[socket.id] = [];
 
@@ -45,11 +40,8 @@ io.on('connect', (socket) => {
       socket.on('disconnect', () => {
         disconnect(socket, game);
       });
-    } else if (code == '') {
-      console.log('jestes na /');
     } else {
       socket.emit('wrongRoom');
-      console.log('there is no such a room');
     }
   });
 
@@ -72,7 +64,6 @@ io.on('connect', (socket) => {
       rounds: rounds,
       roundsCounter: 0,
       roundTime: time,
-      hasStarted: false,
       alphabet: 'ABCDEFGHIJKLMNOPRSTUWZ',
       checkDuplicatesCounter: 0,
     };
@@ -109,7 +100,6 @@ io.on('connect', (socket) => {
       console.log('readyPlayers', readyPlayers);
 
       if (readyPlayers.length == game.playersNumber) {
-        game.hasStarted = true;
         const alphabet = game.alphabet;
         let random = alphabet[Math.floor(Math.random() * alphabet.length)];
 

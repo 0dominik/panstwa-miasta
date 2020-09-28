@@ -11,7 +11,7 @@
     <h1 class="logo">
       <a href="/">Scattergories game</a>
     </h1>
-    <div class="container">
+    <div class="host-container">
       <label for="players-number">Number of players:</label>
       <select id="players-number" class="input number-input players-number">
         <option value="2">2</option>
@@ -21,8 +21,8 @@
       </select>
       <label for="round-time">Round time:</label>
       <select id="round-time" class="input select-input round-time">
-        <option value="30">30 seconds</option>
-        <option value="60" selected>1 minute</option>
+        <option value="30" selected>30 seconds</option>
+        <option value="60">1 minute</option>
         <option value="120">2 minute</option>
         <option value="180">3 minute</option>
       </select>
@@ -43,7 +43,7 @@
         <input type="checkbox" id="animal" class="checkbox" />
         <label class="checkbox-label" for="animal"> Animal </label>
       </div>
-      <button type="submit" class="btn host">Host</button>
+      <button type="submit" class="btn host">Create game</button>
     </div>
 
     <div class="info"></div>
@@ -54,7 +54,7 @@
       <p class="letter-container">Letter: <span class="letter">-</span></p>
       <p class="timer">00:00</p>
       <button class="btn ready-btn">Press if ready</button>
-      <button class="btn done-btn inactive">I've finished</button>
+      <button class="btn done-btn inactive">Finish before time</button>
     </div>
 
     <div class="players inactive">
@@ -65,6 +65,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script src="./js/host.js"></script>
+    <script src="./js/join.js"></script>
     <script src="./js/game.js"></script>
   </body>
 </html>

@@ -19,11 +19,15 @@ body {
 
 .logo {
   text-align: center;
-  color: #392f5a;
   background-color: #f3c545;
   margin-bottom: 25px;
   padding: 10px;
   width: 100vw;
+
+  a {
+    text-decoration: none;
+    color: #392f5a;
+  }
 }
 
 .input-container {
@@ -160,7 +164,7 @@ li {
   margin: 1px;
 }
 
-.column {
+.cell {
   display: flex;
   flex-direction: column;
 }
@@ -192,6 +196,7 @@ li {
 .info {
   text-align: center;
   margin-bottom: 25px;
+  text-align: center;
 }
 
 .players {
@@ -204,7 +209,7 @@ li {
   margin-bottom: 10px;
 }
 
-.container {
+.host-container {
   display: flex;
   justify-content: center;
   align-items: center;

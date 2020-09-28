@@ -1,10 +1,6 @@
-// socket.emit('joinroom', location.pathname.substring(1));
-
 const table = document.querySelector('.table');
 const timerContainer = document.querySelector('.timer-container');
-
 const playersList = document.querySelector('.players-list');
-const players = document.querySelector('.players');
 const joinAddress = document.querySelector('.join-address');
 const info = document.querySelector('.info');
 
@@ -48,6 +44,8 @@ socket.on('start', ({ game, code }) => {
   doneBtn.classList.remove('inactive');
   letterContainer.classList.remove('inactive');
   table.classList.remove('inactive');
+
+  const timer = document.querySelector('.timer');
   timer.classList.remove('inactive');
 
   info.innerHTML = `
@@ -58,7 +56,7 @@ socket.on('start', ({ game, code }) => {
         <li>players: ${game.playersNumber}</li>
       </ul>`;
 
-  table.innerHTML += newCreateTable(game.categories, game.letter, game.roundsCounter);
+  table.innerHTML += createTable(game.categories, game.letter, game.roundsCounter);
 
   const startTimer = (duration, display, code) => {
     let time = duration;
@@ -77,6 +75,7 @@ socket.on('start', ({ game, code }) => {
         socket.emit('endround', code);
       }
     };
+
     socket.on('getWords', () => {
       clearInterval(interval);
     });
@@ -90,8 +89,6 @@ socket.on('start', ({ game, code }) => {
     socket.emit('endround', code);
   });
 });
-
-const timer = document.querySelector('.timer');
 
 socket.on('getWords', (game) => {
   const [...words] = document.querySelectorAll('.word-input');
@@ -131,15 +128,15 @@ socket.on('endgame', ({ players, code }) => {
 
   const points = [];
 
-  Object.keys(players).forEach((el) => {
-    points.push(players[el].points);
+  Object.keys(players).forEach((player) => {
+    points.push(players[player].points);
   });
 
   const winner = [];
 
-  Object.keys(players).forEach((el) => {
-    if (players[el].points == Math.max(...points)) {
-      winner.push(el);
+  Object.keys(players).forEach((player) => {
+    if (players[player].points == Math.max(...points)) {
+      winner.push(player);
     }
   });
 
@@ -149,33 +146,18 @@ socket.on('endgame', ({ players, code }) => {
   socket.emit('deleteGame', code);
 });
 
-const createTable = (cat, letter) => {
-  return `
-  <thead>
-  <tr>
-    <th class="th">letter</th>
-    ${cat.map((el) => `<th class="th">${el}</th>`).join('')}
-  </tr>
-  </thead>
-  <tbody class="tbody">
-  <tr class="tr">
-  </tr>
-  </tbody>
-  `;
-};
-
-const newCreateTable = (cat, letter, round) => {
+const createTable = (cat, letter, round) => {
   if (round === 0) {
     return `
       <div class="row">
-        <div class="column">
+        <div class="cell">
           <span class="category-label">letter</span>
           <div class="input-container">${letter}</div>
         </div>
         ${cat
           .map(
             (el) => `
-        <div class="column">
+        <div class="cell">
           <label class="category-label" for="${el}-category">${el}</label>
           <div class="input-container">
             <input id="${el}-category" class="word-input" type="text" />
@@ -187,13 +169,13 @@ const newCreateTable = (cat, letter, round) => {
   } else {
     return `
       <div class="row">
-        <div class="column">
+        <div class="cell">
           <div class="input-container">${letter}</div>
         </div>
         ${cat
           .map(
             (el) => `
-        <div class="column">
+        <div class="cell">
           <div class="input-container">
             <input id="${el}-category" class="word-input" type="text" />
           </div>

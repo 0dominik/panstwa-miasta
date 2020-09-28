@@ -40,6 +40,8 @@ io.on('connect', (socket) => {
       socket.on('disconnect', () => {
         disconnect(socket, game);
       });
+    } else if (code == '') {
+      console.log('/');
     } else {
       socket.emit('wrongRoom');
     }

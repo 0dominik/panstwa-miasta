@@ -58,20 +58,29 @@ socket.on('start', ({ game, code }) => {
 
   table.innerHTML += createTable(game.categories, game.letter, game.roundsCounter);
 
+  endBtn.addEventListener('click', () => {
+    let wordList = [];
+    const [...words] = document.querySelectorAll('.word-input');
+
+    words.forEach((wordInput) => {
+      const word = wordInput.value;
+      console.log('word', word);
+      if (word != '' && word[0].toUpperCase() == game.letter) {
+        wordList.push(word.toLowerCase());
+      }
+    });
+
+    if (wordList.length == game.categories.length) {
+      socket.emit('endround', code);
+    } else {
+      error.classList.remove('inactive');
+    }
+  });
+
   const startTimer = (duration, display, code) => {
     let time = duration;
     let minutes;
     let seconds;
-
-    endBtn.addEventListener('click', () => {
-      if (duration - time > 10) {
-        socket.emit('endround', code);
-        clearInterval(interval);
-        time = duration;
-      } else {
-        error.classList.remove('inactive');
-      }
-    });
 
     const timer = () => {
       minutes = parseInt(time / 60, 10);

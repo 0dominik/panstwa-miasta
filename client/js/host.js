@@ -27,7 +27,7 @@ host.addEventListener('click', () => {
   }
 });
 
-socket.on('setcode', ({ code, id, roundTime }) => {
+socket.on('setcode', ({ code, id }) => {
   if (id == socket.id) {
     window.history.pushState('', '', `/${code}`);
     playersContainer.classList.remove('inactive');

@@ -22,8 +22,7 @@ socket.on('playerchange', (game) => {
         .join('')}`;
 });
 
-const doneBtn = document.querySelector('.done-btn');
-const incorrectCode = document.querySelector('.incorrect');
+const endBtn = document.querySelector('.end-btn');
 const readyBtn = document.querySelector('.ready-btn');
 
 readyBtn.addEventListener('click', () => {
@@ -36,12 +35,13 @@ readyBtn.addEventListener('click', () => {
 
 const letter = document.querySelector('.letter');
 const letterContainer = document.querySelector('.letter-container');
+const error = document.querySelector('.error');
 
 socket.on('start', ({ game, code }) => {
   readyBtn.classList.add('inactive');
   readyBtn.textContent = 'Press if ready';
   info.classList.remove('inactive');
-  doneBtn.classList.remove('inactive');
+  endBtn.classList.remove('inactive');
   letterContainer.classList.remove('inactive');
   table.classList.remove('inactive');
 
@@ -62,6 +62,17 @@ socket.on('start', ({ game, code }) => {
     let time = duration;
     let minutes;
     let seconds;
+
+    endBtn.addEventListener('click', () => {
+      if (duration - time > 10) {
+        socket.emit('endround', code);
+        clearInterval(interval);
+        time = duration;
+      } else {
+        error.classList.remove('inactive');
+      }
+    });
+
     const timer = () => {
       minutes = parseInt(time / 60, 10);
       seconds = parseInt(time % 60, 10);
@@ -72,11 +83,13 @@ socket.on('start', ({ game, code }) => {
 
       if (--time < 0) {
         time = duration;
+        clearInterval(interval);
         socket.emit('endround', code);
       }
     };
 
     socket.on('getWords', () => {
+      time = duration;
       clearInterval(interval);
     });
     const interval = setInterval(timer, 1000);
@@ -84,16 +97,13 @@ socket.on('start', ({ game, code }) => {
 
   startTimer(game.roundTime, timer, code);
   letter.textContent = game.letter;
-
-  doneBtn.addEventListener('click', () => {
-    socket.emit('endround', code);
-  });
 });
 
 socket.on('getWords', (game) => {
   const [...words] = document.querySelectorAll('.word-input');
   words.length = game.categories.length; //prevent adding inputs by player
-  doneBtn.classList.add('inactive');
+  endBtn.classList.add('inactive');
+  error.classList.add('inactive');
   let wordList = [];
 
   words.forEach((wordInput) => {
@@ -123,7 +133,7 @@ socket.on('endgame', ({ players, code }) => {
   info.classList.remove('inactive');
   timerContainer.classList.add('inactive');
   table.classList.add('inactive');
-  doneBtn.classList.add('inactive');
+  endBtn.classList.add('inactive');
   joinAddress.classList.add('inactive');
 
   const points = [];

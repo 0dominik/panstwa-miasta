@@ -53,7 +53,7 @@ socket.on('start', ({ game, code }) => {
       <ul>
         <li class="round">rounds: ${game.roundsCounter + 1}/${game.rounds}</li>  
         <li>round time: ${game.roundTime} seconds</li>  
-        <li>players: ${game.playersNumber}</li>
+        <li>players: ${game.playersNumber} </li>
       </ul>`;
 
   table.innerHTML += createTable(game.categories, game.letter, game.roundsCounter);

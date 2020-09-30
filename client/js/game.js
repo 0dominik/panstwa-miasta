@@ -3,6 +3,10 @@ const timerContainer = document.querySelector('.timer-container');
 const playersList = document.querySelector('.players-list');
 const joinAddress = document.querySelector('.join-address');
 const info = document.querySelector('.info');
+const letter = document.querySelector('.letter');
+const error = document.querySelector('.error');
+const endBtn = document.querySelector('.end-btn');
+const readyBtn = document.querySelector('.ready-btn');
 
 socket.on('playerchange', (game) => {
   const players = game.players;
@@ -22,9 +26,6 @@ socket.on('playerchange', (game) => {
         .join('')}`;
 });
 
-const endBtn = document.querySelector('.end-btn');
-const readyBtn = document.querySelector('.ready-btn');
-
 readyBtn.addEventListener('click', () => {
   const code = location.pathname.substring(1);
   if (code) {
@@ -33,16 +34,11 @@ readyBtn.addEventListener('click', () => {
   }
 });
 
-const letter = document.querySelector('.letter');
-const letterContainer = document.querySelector('.letter-container');
-const error = document.querySelector('.error');
-
 socket.on('start', ({ game, code }) => {
   readyBtn.classList.add('inactive');
   readyBtn.textContent = 'Press if ready';
   info.classList.remove('inactive');
   endBtn.classList.remove('inactive');
-  letterContainer.classList.remove('inactive');
   table.classList.remove('inactive');
 
   const timer = document.querySelector('.timer');
@@ -60,7 +56,7 @@ socket.on('start', ({ game, code }) => {
 
   endBtn.addEventListener('click', () => {
     let wordList = [];
-    const [...words] = document.querySelectorAll('.word-input');
+    const words = document.querySelectorAll('.word-input');
 
     words.forEach((wordInput) => {
       const word = wordInput.value;
@@ -109,8 +105,8 @@ socket.on('start', ({ game, code }) => {
 });
 
 socket.on('getWords', (game) => {
-  const [...words] = document.querySelectorAll('.word-input');
-  words.length = game.categories.length; //prevent adding inputs by player
+  const words = document.querySelectorAll('.word-input');
+  words.length = game.categories.length;
   endBtn.classList.add('inactive');
   error.classList.add('inactive');
   let wordList = [];

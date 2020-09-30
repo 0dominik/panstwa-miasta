@@ -40,16 +40,14 @@ io.on('connect', (socket) => {
       socket.on('disconnect', () => {
         disconnect(socket, game);
       });
-    } else if (code == '') {
-      console.log('/');
-    } else {
+    } else if (code !== '') {
       socket.emit('wrongRoom');
     }
   });
 
   socket.on('host', ({ categories, playersNumber, rounds, time }) => {
-    // const code = Math.floor(Math.random() * 901 + 100);
-    const code = 200;
+    const code = Math.floor(Math.random() * 9001 + 1000);
+    // const code = 2000;
 
     socket.join(code);
     games[code] = {
@@ -72,8 +70,6 @@ io.on('connect', (socket) => {
 
     const game = games[code];
 
-    console.dir(games, { depth: null });
-
     socket.emit('setcode', { code: code, id: socket.id, roundTime: game.roundTime });
     socket.emit('playerchange', game);
 
@@ -91,15 +87,13 @@ io.on('connect', (socket) => {
   socket.on('ready', (code) => {
     const game = games[code];
 
-    try {
+    if (game) {
       game.players[socket.id].isReady = true;
       io.to(code).emit('playerchange', game);
 
       const readyPlayers = Object.values(game.players)
         .map((player) => player.isReady === true)
         .filter((value) => value);
-
-      console.log('readyPlayers', readyPlayers);
 
       if (readyPlayers.length == game.playersNumber) {
         const alphabet = game.alphabet;
@@ -112,8 +106,6 @@ io.on('connect', (socket) => {
 
         io.to(code).emit('start', { game: game, code: code });
       }
-    } catch {
-      console.log('error');
     }
   });
 
@@ -131,7 +123,7 @@ io.on('connect', (socket) => {
 
     wordList.forEach((word) => {
       if (word != '---') {
-        game.players[socket.id].points += 10;
+        game.players[socket.id].points += 2;
       }
     });
 
@@ -148,14 +140,13 @@ io.on('connect', (socket) => {
 
         if (duplicates.length > 1) {
           duplicates.forEach((index) => {
-            game.players[Object.keys(game.players)[index]].points -= 5;
+            game.players[Object.keys(game.players)[index]].points -= 1;
           });
         }
       });
 
       game.roundsCounter++;
       if (game.roundsCounter == game.rounds) {
-        console.log('KONIEC GRY');
         Object.keys(game.players).forEach((player) => {
           game.players[player].words = null;
         });

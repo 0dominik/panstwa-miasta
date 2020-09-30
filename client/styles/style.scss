@@ -17,12 +17,15 @@ body {
   padding: 0;
 }
 
-.logo {
+.header {
   text-align: center;
   background-color: #f3c545;
   margin-bottom: 25px;
-  padding: 10px;
   width: 100vw;
+}
+
+.logo {
+  padding: 10px;
 
   a {
     text-decoration: none;

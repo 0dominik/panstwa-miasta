@@ -8,9 +8,11 @@
     <link rel="stylesheet" href="/styles/style.css" />
   </head>
   <body>
-    <h1 class="logo">
-      <a href="/">Scattergories game</a>
-    </h1>
+    <header class="header">
+      <h1 class="logo">
+        <a href="/">Scattergories game</a>
+      </h1>
+    </header>
     <div class="host-container">
       <label for="players-number">Number of players:</label>
       <select id="players-number" class="input number-input players-number">
@@ -51,11 +53,11 @@
     <div class="table inactive"></div>
 
     <div class="timer-container inactive">
-      <p class="letter-container">Letter: <span class="letter">-</span></p>
+      <p>Letter: <span class="letter">-</span></p>
       <p class="timer">00:00</p>
       <button class="btn ready-btn">Press if ready</button>
       <button class="btn end-btn inactive">Finish before time</button>
-      <p class="error inactive">Wait at least 10 seconds to finish...</p>
+      <p class="error inactive">You have to fill in all cells to finish game before time!</p>
     </div>
 
     <div class="players inactive">

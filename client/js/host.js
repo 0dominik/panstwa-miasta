@@ -1,7 +1,7 @@
 const socket = io();
 
 const container = document.querySelector('.host-container');
-const host = document.querySelector('.host');
+const hostBtn = document.querySelector('.host');
 let categories = [];
 const checkboxes = document.querySelectorAll('.checkbox');
 const playersNumber = document.querySelector('.players-number');
@@ -9,9 +9,9 @@ const roundsNumber = document.querySelector('.round-input');
 const roundTime = document.querySelector('.round-time');
 const playersContainer = document.querySelector('.players');
 
-host.addEventListener('click', () => {
+hostBtn.addEventListener('click', () => {
   checkboxes.forEach((checkbox) => {
-    return checkbox.checked ? categories.push(checkbox.id) : null;
+    checkbox.checked ? categories.push(checkbox.id) : null;
   });
 
   if (categories.length < 2 || roundsNumber.value < 1 || roundsNumber.value > 10) {

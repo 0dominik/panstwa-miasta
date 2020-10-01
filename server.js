@@ -46,8 +46,8 @@ io.on('connect', (socket) => {
   });
 
   socket.on('host', ({ categories, playersNumber, rounds, time }) => {
-    // const code = Math.floor(Math.random() * 9001 + 1000);
-    const code = 2000;
+    const code = Math.floor(Math.random() * 9001 + 1000);
+    // const code = 2000;
 
     socket.join(code);
     games[code] = {

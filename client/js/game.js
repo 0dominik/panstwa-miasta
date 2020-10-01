@@ -1,3 +1,4 @@
+const inputs = document.querySelector('.inputs');
 const table = document.querySelector('.table');
 const timerContainer = document.querySelector('.timer-container');
 const playersList = document.querySelector('.players-list');
@@ -15,12 +16,11 @@ socket.on('playerchange', (game) => {
       ${Object.keys(game.players)
         .map((el) => {
           const isReady = players[el].isReady ? 'READY' : '';
-          const words = players[el].words ? `, last words: ${players[el].words}` : '';
 
           if (el == socket.id) {
-            return `<li class="points hl">[YOU]${players[el].name}: ${players[el].points} points${words} ${isReady}</li>`;
+            return `<li class="points hl">[YOU]${players[el].name}: ${players[el].points} points ${isReady}</li>`;
           } else {
-            return `<li class="points">${players[el].name}: ${players[el].points} points${words} ${isReady}</li>`;
+            return `<li class="points">${players[el].name}: ${players[el].points} points ${isReady}</li>`;
           }
         })
         .join('')}`;
@@ -39,7 +39,7 @@ socket.on('start', ({ game, code }) => {
   readyBtn.textContent = 'Press if ready';
   info.classList.remove('inactive');
   endBtn.classList.remove('inactive');
-  table.classList.remove('inactive');
+  inputs.classList.remove('inactive');
 
   const timer = document.querySelector('.timer');
   timer.classList.remove('inactive');
@@ -52,7 +52,17 @@ socket.on('start', ({ game, code }) => {
         <li>players: ${game.playersNumber} </li>
       </ul>`;
 
-  table.innerHTML += createTable(game.categories, game.letter, game.roundsCounter);
+  inputs.innerHTML = `
+  ${game.categories
+    .map(
+      (cat) => `
+        <div class="input-container">
+        <label class="category-label" for="${cat}-category">${cat}: </label>
+        <input id="${cat}-category" class="word-input" type="text" />
+      </div>
+      `
+    )
+    .join('')}`;
 
   endBtn.addEventListener('click', () => {
     let wordList = [];
@@ -60,7 +70,6 @@ socket.on('start', ({ game, code }) => {
 
     words.forEach((wordInput) => {
       const word = wordInput.value;
-      console.log('word', word);
       if (word != '' && word[0].toUpperCase() == game.letter) {
         wordList.push(word.toLowerCase());
       }
@@ -105,7 +114,7 @@ socket.on('start', ({ game, code }) => {
 });
 
 socket.on('getWords', (game) => {
-  const words = document.querySelectorAll('.word-input');
+  const [...words] = document.querySelectorAll('.word-input');
   words.length = game.categories.length;
   endBtn.classList.add('inactive');
   error.classList.add('inactive');
@@ -113,7 +122,7 @@ socket.on('getWords', (game) => {
 
   words.forEach((wordInput) => {
     const word = wordInput.value;
-    if (word != '' && word[0].toUpperCase() == game.letter) {
+    if (word !== '' && word[0].toUpperCase() === game.letter) {
       wordList.push(word.toLowerCase());
     } else {
       wordList.push('---');
@@ -124,9 +133,7 @@ socket.on('getWords', (game) => {
     socket.emit('wordlist', { code: game.id, wordList: wordList });
   }
 
-  //remove inputs and put its value to table
   words.forEach((wordInput) => {
-    wordInput.parentNode.textContent = wordInput.value;
     wordInput.remove();
   });
 
@@ -134,10 +141,14 @@ socket.on('getWords', (game) => {
   readyBtn.classList.remove('inactive');
 });
 
+socket.on('updateTable', (game) => {
+  table.innerHTML += createTable(game);
+});
+
 socket.on('endgame', ({ players, code }) => {
   info.classList.remove('inactive');
   timerContainer.classList.add('inactive');
-  table.classList.add('inactive');
+  inputs.classList.add('inactive');
   endBtn.classList.add('inactive');
   joinAddress.classList.add('inactive');
 
@@ -161,43 +172,50 @@ socket.on('endgame', ({ players, code }) => {
   socket.emit('deleteGame', code);
 });
 
-const createTable = (cat, letter, round) => {
-  if (round === 0) {
+const createTable = (game) => {
+  if (game.roundsCounter === 1) {
     return `
-      <div class="row">
-        <div class="cell">
-          <span class="category-label">letter</span>
-          <div class="input-container">${letter}</div>
-        </div>
-        ${cat
-          .map(
-            (el) => `
-        <div class="cell">
-          <label class="category-label" for="${el}-category">${el}</label>
-          <div class="input-container">
-            <input id="${el}-category" class="word-input" type="text" />
-          </div>
-        </div>`
-          )
+      <thead>
+      <tr>
+        <th class="th">letter</th>
+        <th class="th">player</th>
+        ${game.categories
+          .map((cat) => {
+            return `<th class="th">${cat}</th>`;
+          })
           .join('')}
-      </div>`;
+      </tr>
+    </thead>
+    <tbody class="tbody">
+    <tr class="tr">
+    <td class="td-letter" rowspan="${Object.keys(game.players).length}">${game.letter}</td>
+        ${Object.keys(game.words)
+          .map((player) => {
+            return `
+          <td class="td">${player}</td>
+          ${game.words[player]
+            .map((cat, i) => {
+              return `<td class="td">${game.words[player][i]}</td>`;
+            })
+            .join('')}
+        </tr>`;
+          })
+          .join('')}
+    </tbody>`;
   } else {
-    return `
-      <div class="row">
-        <div class="cell">
-          <div class="input-container">${letter}</div>
-        </div>
-        ${cat
-          .map(
-            (el) => `
-        <div class="cell">
-          <div class="input-container">
-            <input id="${el}-category" class="word-input" type="text" />
-          </div>
-        </div>
-        `
-          )
-          .join('')}
-      </div>`;
+    return `<tr class="tr">
+    <td class="td-letter" rowspan="${Object.keys(game.players).length}">${game.letter}</td>
+        ${Object.keys(game.words)
+          .map((player) => {
+            return `
+          <td class="td">${player}</td>
+          ${game.words[player]
+            .map((el, i) => {
+              return `<td class="td">${game.words[player][i]}</td>`;
+            })
+            .join('')}
+        </tr>`;
+          })
+          .join('')}`;
   }
 };

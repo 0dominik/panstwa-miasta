@@ -147,8 +147,10 @@ li {
 
 .table {
   display: flex;
-  flex-direction: column;
   margin-bottom: 25px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 }
 
 .row {
@@ -158,27 +160,16 @@ li {
   text-align: center;
 }
 
-.category-label {
-  border: 2px solid black;
-  background-color: #f3c545;
-  padding: 5px 10px;
-  margin: 1px;
-}
-
-.cell {
+.input-container {
   display: flex;
   flex-direction: column;
-}
-
-.input-container {
-  background-color: #f5dd9c;
-  margin: 1px;
-  border: 2px solid black;
-  height: 38px;
-  display: flex;
   justify-content: center;
   align-items: center;
-  width: 150px;
+  background-color: #f3c545;
+  border: 2px solid black;
+  width: 175px;
+  padding: 5px;
+  margin: 1px;
 }
 
 .word-input {
@@ -187,10 +178,11 @@ li {
   font-size: 1.5rem;
   padding: 0 5px;
   box-sizing: border-box;
+  height: 30px;
 }
 
 .word-input:focus, .word-input:active {
-  background-color: #fffaed;
+  background-color: #fcf5e3;
 }
 
 .info {
@@ -232,6 +224,10 @@ li {
 
 .letter {
   font-weight: bold;
+  font-size: 1.6rem;
+  border: 2px solid black;
+  background-color: #f3c545;
+  padding: 5px 10px;
 }
 
 .join-address {

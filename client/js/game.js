@@ -9,7 +9,7 @@ const error = document.querySelector('.error');
 const endBtn = document.querySelector('.end-btn');
 const readyBtn = document.querySelector('.ready-btn');
 
-socket.on('playerchange', (game) => {
+socket.on('playerChange', (game) => {
   const players = game.players;
 
   playersList.innerHTML = `
@@ -47,7 +47,7 @@ socket.on('start', ({ game, code }) => {
   info.innerHTML = `
       <h2>GAME INFO</h2>
       <ul>
-        <li class="round">rounds: ${game.roundsCounter + 1}/${game.rounds}</li>  
+        <li class="round">round: ${game.roundsCounter + 1}/${game.rounds}</li>  
         <li>round time: ${game.roundTime} seconds</li>  
         <li>players: ${game.playersNumber} </li>
       </ul>`;
@@ -57,9 +57,9 @@ socket.on('start', ({ game, code }) => {
     .map(
       (cat) => `
         <div class="input-container">
-        <label class="category-label" for="${cat}-category">${cat}: </label>
-        <input id="${cat}-category" class="word-input" type="text" />
-      </div>
+          <label class="category-label" for="${cat}-category">${cat}: </label>
+          <input id="${cat}-category" class="word-input" type="text" />
+        </div>
       `
     )
     .join('')}`;
@@ -137,7 +137,6 @@ socket.on('getWords', (game) => {
     wordInput.remove();
   });
 
-  socket.emit('playerchange', game.id);
   readyBtn.classList.remove('inactive');
 });
 
@@ -173,6 +172,21 @@ socket.on('endgame', ({ players, code }) => {
 });
 
 const createTable = (game) => {
+  let html = `<tr class="tr">
+  <td class="td-letter" rowspan="${Object.keys(game.players).length}">${game.letter}</td>
+      ${Object.keys(game.words)
+        .map((player) => {
+          return `
+        <td class="td">${player === socket.id ? `<b>${player}</>` : player}</td>
+        ${game.words[player]
+          .map((el, i) => {
+            return `<td class="td">${game.words[player][i]}</td>`;
+          })
+          .join('')}
+      </tr>`;
+        })
+        .join('')}`;
+
   if (game.roundsCounter === 1) {
     return `
       <thead>
@@ -187,35 +201,9 @@ const createTable = (game) => {
       </tr>
     </thead>
     <tbody class="tbody">
-    <tr class="tr">
-    <td class="td-letter" rowspan="${Object.keys(game.players).length}">${game.letter}</td>
-        ${Object.keys(game.words)
-          .map((player) => {
-            return `
-          <td class="td">${player}</td>
-          ${game.words[player]
-            .map((cat, i) => {
-              return `<td class="td">${game.words[player][i]}</td>`;
-            })
-            .join('')}
-        </tr>`;
-          })
-          .join('')}
+      ${html}
     </tbody>`;
   } else {
-    return `<tr class="tr">
-    <td class="td-letter" rowspan="${Object.keys(game.players).length}">${game.letter}</td>
-        ${Object.keys(game.words)
-          .map((player) => {
-            return `
-          <td class="td">${player}</td>
-          ${game.words[player]
-            .map((el, i) => {
-              return `<td class="td">${game.words[player][i]}</td>`;
-            })
-            .join('')}
-        </tr>`;
-          })
-          .join('')}`;
+    return html;
   }
 };

@@ -10,7 +10,7 @@ const server = app.listen(PORT, () => {
 
 app.use(express.static('./client'));
 
-app.get(/(^\/[0-9]+$)/, (req, res) => {
+app.get('/:id', (req, res) => {
   res.sendFile(__dirname + '/client/index.html');
 });
 
@@ -19,18 +19,18 @@ const io = socket(server);
 const games = {};
 
 io.on('connect', (socket) => {
-  socket.on('joinroom', (code) => {
+  socket.on('joinRoom', (code) => {
     const game = games[code];
     if (game && game.playersNumber > Object.keys(game.players).length) {
       socket.join(code);
-      game.words[socket.id] = [];
 
+      game.words[socket.id] = [];
       game.players[`${socket.id}`] = {
         points: 0,
         name: socket.id,
       };
 
-      io.to(code).emit('playerchange', game);
+      io.to(code).emit('playerChange', game);
 
       console.log('games');
       console.dir(games, { depth: null });
@@ -47,7 +47,6 @@ io.on('connect', (socket) => {
 
   socket.on('host', ({ categories, playersNumber, rounds, time }) => {
     const code = Math.floor(Math.random() * 9001 + 1000);
-    // const code = 2000;
 
     socket.join(code);
     games[code] = {
@@ -70,8 +69,8 @@ io.on('connect', (socket) => {
 
     const game = games[code];
 
-    socket.emit('setcode', { code: code, id: socket.id, roundTime: game.roundTime });
-    socket.emit('playerchange', game);
+    socket.emit('setcode', { code: code, id: socket.id });
+    socket.emit('playerChange', game);
 
     socket.on('disconnect', () => {
       //delete game if host leaves
@@ -89,7 +88,7 @@ io.on('connect', (socket) => {
 
     if (game) {
       game.players[socket.id].isReady = true;
-      io.to(code).emit('playerchange', game);
+      io.to(code).emit('playerChange', game);
 
       const readyPlayers = Object.values(game.players)
         .map((player) => player.isReady === true)
@@ -118,7 +117,6 @@ io.on('connect', (socket) => {
 
     game.checkDuplicatesCounter++;
     game.words[socket.id] = wordList;
-
     game.players[socket.id].words = wordList;
 
     wordList.forEach((word) => {
@@ -131,10 +129,10 @@ io.on('connect', (socket) => {
       // sprawdzamy duplikaty, jeśli są wszystkie słowa
       game.checkDuplicatesCounter = 0;
 
-      game.categories.forEach((el, i) => {
+      game.categories.forEach((x, i) => {
         let words = [];
 
-        Object.values(game.words).forEach((el) => words.push(el[i]));
+        Object.values(game.words).forEach((arr) => words.push(arr[i]));
 
         const duplicates = getDuplicates(words);
 
@@ -154,7 +152,7 @@ io.on('connect', (socket) => {
         io.to(code).emit('endgame', { players: game.players, code: code });
       }
 
-      io.to(code).emit('playerchange', game);
+      io.to(code).emit('playerChange', game);
       io.to(code).emit('updateTable', games[code]);
 
       socket.on('deleteGame', () => {
@@ -175,7 +173,7 @@ const disconnect = (socket, game) => {
     delete game.players[socket.id];
     delete game.words[socket.id];
     socket.leave(game.id);
-    io.to(game.id).emit('playerchange', game);
+    io.to(game.id).emit('playerChange', game);
   }
 };
 

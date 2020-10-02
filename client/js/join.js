@@ -1,4 +1,4 @@
-socket.emit('joinroom', location.pathname.substring(1));
+socket.emit('joinRoom', location.pathname.substring(1));
 
 socket.on('prepareGame', () => {
   playersContainer.classList.remove('inactive');
@@ -11,7 +11,7 @@ socket.on('prepareGame', () => {
 
 socket.on('wrongRoom', () => {
   playersContainer.classList.add('inactive');
+  container.classList.add('inactive');
   info.classList.remove('inactive');
   info.textContent = 'Wrong address, game ended or the room is full. Try another one or create a new room.';
-  container.classList.add('inactive');
 });

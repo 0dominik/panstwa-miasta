@@ -2,7 +2,6 @@ const socket = io();
 
 const container = document.querySelector('.host-container');
 const hostBtn = document.querySelector('.host');
-let categories = [];
 const checkboxes = document.querySelectorAll('.checkbox');
 const playersNumber = document.querySelector('.players-number');
 const roundsNumber = document.querySelector('.round-input');
@@ -10,6 +9,8 @@ const roundTime = document.querySelector('.round-time');
 const playersContainer = document.querySelector('.players');
 
 hostBtn.addEventListener('click', () => {
+  let categories = [];
+
   checkboxes.forEach((checkbox) => {
     checkbox.checked ? categories.push(checkbox.id) : null;
   });
@@ -28,8 +29,8 @@ hostBtn.addEventListener('click', () => {
 });
 
 socket.on('setcode', ({ code, id }) => {
-  if (id == socket.id) {
-    window.history.pushState('', '', `/${code}`);
+  if (id === socket.id) {
+    history.pushState('', '', `/${code}`);
     playersContainer.classList.remove('inactive');
     joinAddress.innerText = `Join address: ${window.location.href}`;
   }

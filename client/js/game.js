@@ -117,6 +117,7 @@ socket.on('getWords', (game) => {
   const [...words] = document.querySelectorAll('.word-input');
   words.length = game.categories.length;
   endBtn.classList.add('inactive');
+  endBtn.classList.disabled = true;
   error.classList.add('inactive');
   let wordList = [];
 
@@ -134,7 +135,7 @@ socket.on('getWords', (game) => {
   }
 
   words.forEach((wordInput) => {
-    wordInput.remove();
+    wordInput.disabled = true;
   });
 
   readyBtn.classList.remove('inactive');

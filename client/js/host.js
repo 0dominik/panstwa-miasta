@@ -2,13 +2,29 @@ const socket = io();
 
 const container = document.querySelector('.host-container');
 const hostBtn = document.querySelector('.host');
-const checkboxes = document.querySelectorAll('.checkbox');
+
+const categoryInput = document.querySelector('.custom-category');
+const categoryBtn = document.querySelector('.add-category');
+const categoriesContainer = document.querySelector('.categories');
+
 const playersNumber = document.querySelector('.players-number');
 const roundsNumber = document.querySelector('.round-input');
 const roundTime = document.querySelector('.round-time');
 const playersContainer = document.querySelector('.players');
 
+categoryBtn.addEventListener('click', () => {
+  categoriesContainer.insertAdjacentHTML(
+    'beforeend',
+    `<input type="checkbox" id="${categoryInput.value}" class="checkbox" />
+  <label class="checkbox-label" for="${categoryInput.value}"> ${categoryInput.value} </label>`,
+  );
+
+  categoryInput.value = '';
+});
+
 hostBtn.addEventListener('click', () => {
+  const checkboxes = document.querySelectorAll('.checkbox');
+
   let categories = [];
 
   checkboxes.forEach((checkbox) => {

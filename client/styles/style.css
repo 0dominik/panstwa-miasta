@@ -127,6 +127,11 @@ li {
   border: 2px dashed black;
 }
 
+.custom-category {
+  width: 100%;
+  margin-top: 5px;
+}
+
 .btn {
   padding: 10px 25px;
   background-color: #392f5a;
@@ -258,10 +263,4 @@ li {
 .error {
   color: #be0404;
   margin-bottom: 10px;
-}
-
-@media (max-width: 750px) {
-  .table {
-    display: none;
-  }
 }

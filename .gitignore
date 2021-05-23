@@ -1,1 +1,7 @@
-/node_modules
+/server/node_modules
+/client/node_modules
+/client/styles/style.css
+/client/build
+/client/.cache
+.eslintrc
+.prettierrc

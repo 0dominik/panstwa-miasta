@@ -1,79 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Scattergories</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles/style.css" />
-  </head>
-  <body>
-    <header class="header">
-      <h1 class="logo">
-        <a href="/">Scattergories game</a>
-      </h1>
-    </header>
-    <div class="host-container">
-      <label for="players-number">Number of players:</label>
-      <select id="players-number" class="input number-input players-number">
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-      </select>
-      <label for="round-time">Round time:</label>
-      <select id="round-time" class="input select-input round-time">
-        <option value="30" selected>30 seconds</option>
-        <option value="60">1 minute</option>
-        <option value="120">2 minutes</option>
-      </select>
-      <label for="round-input">Number of rounds:</label>
-      <input type="number" id="round-input" class="number-input input round-input" value="2" min="1" max="10" />
-      <p class="categories-description">Choose categories</p>
-      <div class="categories">
-        <input type="checkbox" id="country" class="checkbox" checked />
-        <label class="checkbox-label" for="country"> Country </label>
-        <input type="checkbox" id="town" class="checkbox" checked />
-        <label class="checkbox-label" for="town"> Town </label>
-        <input type="checkbox" id="river" class="checkbox" checked />
-        <label class="checkbox-label" for="river"> River </label>
-        <input type="checkbox" id="name" class="checkbox" checked />
-        <label class="checkbox-label" for="name"> Name </label>
-        <input type="checkbox" id="plant" class="checkbox" />
-        <label class="checkbox-label" for="plant"> Plant </label>
-        <input type="checkbox" id="animal" class="checkbox" />
-        <label class="checkbox-label" for="animal"> Animal </label>
 
-        <label class="custom-category-label" for="animal">Custom category:</label>
-        <input type="text" id="custom-category" class="input custom-category" />
-        <button class="btn add-category">Add category</button>
-      </div>
-      <button type="submit" class="btn host">Create game</button>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scattergories</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="/styles/style.css" />
+  <script src="https://cdn.socket.io/4.1.1/socket.io.min.js"
+    integrity="sha384-cdrFIqe3RasCMNE0jeFG9xJHog/tgOVC1E9Lzve8LQN1g5WUHo0Kvk1mawWjxX7a"
+    crossorigin="anonymous" defer></script>
+  <script src="./src/main.js" type="module"></script>
+</head>
+
+<body>
+  <header class="header">
+    <h1 class="logo">
+      <a href="/">Scattergories game</a>
+    </h1>
+  </header>
+
+  <p class="error inactive"></p>
+
+  <div class="host-container">
+    <label for="players-number">Number of players:</label>
+    <select id="players-number" class="input number-input players-number">
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+    <label for="round-time">Round time:</label>
+    <select id="round-time" class="input select-input round-time">
+      <option value="30" selected>30 seconds</option>
+      <option value="60">1 minute</option>
+      <option value="120">2 minutes</option>
+    </select>
+    <label for="round-input">Number of rounds:</label>
+    <input type="number" id="round-input" class="number-input input round-input"
+      value="2" min="1" max="10" />
+    <p class="categories-description">Choose categories</p>
+    <div class="categories">
+      <input type="checkbox" id="country" class="checkbox" checked />
+      <label class="checkbox-label" for="country"> Country </label>
+      <input type="checkbox" id="town" class="checkbox" checked />
+      <label class="checkbox-label" for="town"> Town </label>
+      <input type="checkbox" id="river" class="checkbox" checked />
+      <label class="checkbox-label" for="river"> River </label>
+      <input type="checkbox" id="name" class="checkbox" checked />
+      <label class="checkbox-label" for="name"> Name </label>
+      <input type="checkbox" id="plant" class="checkbox" />
+      <label class="checkbox-label" for="plant"> Plant </label>
+      <input type="checkbox" id="animal" class="checkbox" />
+      <label class="checkbox-label" for="animal"> Animal </label>
     </div>
+    <label class="custom-category-label" for="custom-category">Custom
+      category:</label>
+    <input type="text" id="custom-category" class="input custom-category" />
+    <button class="btn add-category">Add category</button>
+    <button type="submit" class="btn host">Create game</button>
+  </div>
 
-    <div class="info"></div>
+  <div class="info"></div>
 
-    <div class="timer-container inactive">
-      <p>Letter: <span class="letter">-</span></p>
-      <p class="timer">00:00</p>
-      <button class="btn ready-btn">Press if ready</button>
-      <button class="btn end-btn inactive">Finish round</button>
-      <p class="error inactive">You have to correctly fill in all inputs to finish round before time!</p>
-    </div>
+  <div class="timer-container inactive">
+    <p>Letter: <span class="letter">-</span></p>
+    <p class="timer">00:00</p>
+    <button class="btn ready-btn">Press if ready</button>
+    <button class="btn end-btn inactive">Finish round</button>
+    <p class="error inactive">You have to correctly fill in all inputs to finish
+      round before time!</p>
+  </div>
 
-    <div class="inputs inactive"></div>
+  <div class="inputs inactive"></div>
 
-    <div class="players inactive">
-      <h3 class="players-header">Players:</h3>
-      <ul class="players-list"></ul>
-      <p class="join-address"></p>
-    </div>
+  <div class="players inactive">
+    <h3 class="players-header">Players:</h3>
+    <ul class="players-list"></ul>
+    <p class="join-address">Join address: </p>
+  </div>
 
-    <table class="table"></table>
+  <table class="table"></table>
+</body>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-    <script src="./js/host.js"></script>
-    <script src="./js/join.js"></script>
-    <script src="./js/game.js"></script>
-  </body>
 </html>

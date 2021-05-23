@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scattergories</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="/styles/style.css" />
+  <script src="https://cdn.socket.io/4.1.1/socket.io.min.js"
+    integrity="sha384-cdrFIqe3RasCMNE0jeFG9xJHog/tgOVC1E9Lzve8LQN1g5WUHo0Kvk1mawWjxX7a"
+    crossorigin="anonymous" defer></script>
+  <script src="./src/join.js" type="module" defer></script>
+</head>
+
+<body>
+  <header class="header">
+    <h1 class="logo">
+      <a href="/">Scattergories game</a>
+    </h1>
+  </header>
+
+  <p class="error inactive"></p>
+
+  <div class="game">
+    <p class="info"></p>
+
+    <div class="timer-container inactive">
+      <p>Letter: <span class="letter">-</span></p>
+      <p class="timer">00:00</p>
+      <button class="btn ready-btn">Press if ready</button>
+      <button class="btn end-btn inactive">Finish round</button>
+    </div>
+
+    <div class="inputs inactive"></div>
+
+    <div class="players inactive">
+      <h3 class="players-header">Players:</h3>
+      <ul class="players-list"></ul>
+      <p class="join-address">Join address: </p>
+    </div>
+  </div>
+  <table class="table"></table>
+
+</body>
+
+</html>

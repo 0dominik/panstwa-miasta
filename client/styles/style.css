@@ -52,7 +52,8 @@ li {
   background-color: #ffffff;
 }
 
-.input:hover, .input:focus {
+.input:hover,
+.input:focus {
   border: 2px solid #392f5a;
 }
 
@@ -144,7 +145,8 @@ li {
   margin-bottom: 25px;
 }
 
-.btn:hover, .btn:focus {
+.btn:hover,
+.btn:focus {
   transform: translateY(2px);
   background-color: #4a4169;
   box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
@@ -179,7 +181,8 @@ li {
   height: 30px;
 }
 
-.word-input:focus, .word-input:active {
+.word-input:focus,
+.word-input:active {
   background-color: #fcf5e3;
 }
 
